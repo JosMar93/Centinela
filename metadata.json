@@ -1,0 +1,8 @@
+{
+  "name": "CENTINELA: Gestión de Fatiga y Alerta Académica",
+  "description": "Sistema táctico de diagnóstico rápido de fatiga, reactivación discreta en aula, gestión del descanso y monitoreo académico para cadetes e instructores militares.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

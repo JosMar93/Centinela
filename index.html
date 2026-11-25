@@ -1,0 +1,2661 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CENTINELA: Gestión de Fatiga y Alerta Académica</title>
+    <meta
+      name="description"
+      content="Dashboard interactivo de bienestar, gestión de fatiga, reactivación discreta en aula y alerta académica."
+    />
+    <meta property="og:title" content="CENTINELA: Gestión de Fatiga y Alerta Académica" />
+    <meta
+      property="og:description"
+      content="Dashboard interactivo de bienestar, gestión de fatiga, reactivación discreta en aula y alerta académica."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              cream: {
+                50: '#FFFDF9',
+                100: '#FAF6F0',
+                200: '#F5EFE6',
+                300: '#E8DFD1',
+              },
+              charcoal: '#2B2623',
+              stonewarm: '#6E655F',
+              terracotta: {
+                DEFAULT: '#C86D51',
+                dark: '#A8543A',
+                soft: '#FDF2EE',
+              },
+              mustard: {
+                DEFAULT: '#D99B26',
+                dark: '#9A6B12',
+                soft: '#FEF7E7',
+              },
+              sage: {
+                DEFAULT: '#4A7C59',
+                dark: '#386145',
+                soft: '#EEF5F0',
+              },
+              coral: {
+                DEFAULT: '#B84A39',
+                dark: '#963829',
+                soft: '#FBEFEE',
+              },
+            },
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      body {
+        background-color: #FAF6F0;
+        color: #2B2623;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      .tabular-nums {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .text-balance {
+        text-wrap: balance;
+      }
+
+      .warm-card {
+        background-color: #FFFDF9;
+        border: 1px solid #E8DFD1;
+        box-shadow: 0 6px 24px -8px rgba(43, 38, 35, 0.07);
+      }
+
+      /* Warm Range Slider */
+      input[type='range'].warm-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 10px;
+        background: #F5EFE6;
+        border: 1px solid #E8DFD1;
+        border-radius: 9999px;
+        outline: none;
+      }
+
+      input[type='range'].warm-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #C86D51;
+        border: 3px solid #FFFDF9;
+        box-shadow: 0 2px 8px rgba(200, 109, 81, 0.45);
+        cursor: pointer;
+        transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      input[type='range'].warm-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+      }
+
+      input[type='range'].warm-slider::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #C86D51;
+        border: 3px solid #FFFDF9;
+        box-shadow: 0 2px 8px rgba(200, 109, 81, 0.45);
+        cursor: pointer;
+        transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* Breathing Orb Smooth Compositor Transition */
+      #breath-orb {
+        will-change: transform, opacity;
+        transition-property: transform, opacity, border-color, background-color;
+        transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      /* Warm Power Nap Visual Alarm Pulse */
+      @keyframes warmAlarmFlash {
+        0%, 100% {
+          border-color: #B84A39;
+          background-color: #FFFDF9;
+          box-shadow: 0 6px 24px -8px rgba(184, 74, 57, 0.25);
+        }
+        50% {
+          border-color: #D99B26;
+          background-color: #FBEFEE;
+          box-shadow: 0 10px 30px -4px rgba(184, 74, 57, 0.38);
+        }
+      }
+
+      .alarm-flashing {
+        animation: warmAlarmFlash 1s ease-in-out infinite;
+      }
+
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-[#FAF6F0] text-[#2B2623] flex flex-col selection:bg-[#C86D51]/20 selection:text-[#2B2623]">
+    <!-- Clean Warm Top Bar -->
+    <header class="sticky top-0 z-40 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-[#E8DFD1]">
+      <div class="max-w-[1320px] mx-auto px-4 sm:px-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 py-3">
+          <!-- Brand Title -->
+          <div class="flex items-center gap-3 shrink-0">
+            <div class="w-10 h-10 rounded-2xl bg-[#FDF2EE] border border-[#E8DFD1] flex items-center justify-center text-[#C86D51]" aria-hidden="true">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2" />
+                <path d="M12 20v2" />
+                <path d="m4.93 4.93 1.41 1.41" />
+                <path d="m17.66 17.66 1.41 1.41" />
+                <path d="M2 12h2" />
+                <path d="M20 12h2" />
+                <path d="m6.34 17.66-1.41 1.41" />
+                <path d="m19.07 4.93-1.41 1.41" />
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-lg font-extrabold tracking-tight text-[#2B2623] whitespace-nowrap">CENTINELA</span>
+                <span class="text-xs font-medium text-[#6E655F] hidden sm:inline whitespace-nowrap">· Bienestar y Alerta Académica</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Company / Shift Selector + Current Time -->
+          <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0">
+            <div class="flex items-center gap-1.5 bg-[#FAF6F0] border border-[#E8DFD1] rounded-xl px-2.5 py-1.5">
+              <label for="header-company-select" class="sr-only">Compañía</label>
+              <select
+                id="header-company-select"
+                class="bg-transparent text-xs font-semibold text-[#2B2623] focus:outline-none cursor-pointer pr-1"
+                aria-label="Selector rápido de compañía"
+              >
+                <option value="1ra Cía">1ra Cía</option>
+                <option value="2da Cía">2da Cía</option>
+                <option value="3ra Cía">3ra Cía</option>
+                <option value="4ta Cía">4ta Cía</option>
+              </select>
+              <span class="text-[#E8DFD1]" aria-hidden="true">|</span>
+              <label for="header-shift-select" class="sr-only">Turno o jornada</label>
+              <select
+                id="header-shift-select"
+                class="bg-transparent text-xs font-medium text-[#6E655F] focus:outline-none cursor-pointer"
+                aria-label="Selector rápido de jornada"
+              >
+                <option value="regular">Jornada Regular</option>
+                <option value="postcampana">Post-Campaña</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF6F0] border border-[#E8DFD1]" title="Hora actual (24h)">
+              <svg class="w-4 h-4 text-[#C86D51]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <polyline points="12 7 12 12 15.5 14" />
+              </svg>
+              <span id="military-clock" class="font-mono text-xs sm:text-sm font-semibold text-[#2B2623] tabular-nums whitespace-nowrap">--:--:--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clean Section Navigation -->
+        <nav class="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-[#E8DFD1]/80 py-2" aria-label="Navegación principal">
+          <button
+            type="button"
+            data-tab="diagnostico"
+            class="nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+          >
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+            <span>Diagnóstico</span>
+          </button>
+
+          <button
+            type="button"
+            data-tab="reactivacion"
+            class="nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+          >
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            <span>Reactivación en Aula</span>
+          </button>
+
+          <button
+            type="button"
+            data-tab="descanso"
+            class="nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+          >
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <span>Descanso y Rancho</span>
+          </button>
+
+          <button
+            type="button"
+            data-tab="comando"
+            class="nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+          >
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="9" rx="1.5" />
+              <rect x="14" y="3" width="7" height="5" rx="1.5" />
+              <rect x="14" y="12" width="7" height="9" rx="1.5" />
+              <rect x="3" y="16" width="7" height="5" rx="1.5" />
+            </svg>
+            <span>Panel Comando</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="flex-1 w-full max-w-[1320px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <!-- Top Interactive KPI Row (Real-Time) -->
+      <section aria-label="Indicadores clave en tiempo real" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- KPI 1: Índice de Fatiga -->
+        <button
+          type="button"
+          data-jump-tab="diagnostico"
+          class="warm-card rounded-2xl p-4 sm:p-5 text-left hover:border-[#C86D51]/60 transition-all duration-150 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold text-[#6E655F]">Índice de Fatiga</span>
+            <span id="top-kpi-fatigue-tag" class="text-[11px] font-semibold px-2 py-0.5 rounded-full">Evaluando</span>
+          </div>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span id="top-kpi-fatigue-val" class="font-mono text-3xl font-bold text-[#2B2623] tabular-nums">--</span>
+            <span class="font-mono text-xs text-[#6E655F] tabular-nums">/ 100</span>
+          </div>
+          <div class="mt-3 h-2 w-full rounded-full bg-[#F5EFE6] overflow-hidden">
+            <div id="top-kpi-fatigue-bar" class="h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+          </div>
+        </button>
+
+        <!-- KPI 2: Sueño Promedio -->
+        <button
+          type="button"
+          data-jump-tab="comando"
+          class="warm-card rounded-2xl p-4 sm:p-5 text-left hover:border-[#C86D51]/60 transition-all duration-150 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold text-[#6E655F]">Sueño Promedio</span>
+            <span id="top-kpi-sleep-scope" class="text-[11px] font-mono text-[#6E655F] tabular-nums">Batallón</span>
+          </div>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span id="top-kpi-sleep-val" class="font-mono text-3xl font-bold text-[#2B2623] tabular-nums">--</span>
+            <span id="top-kpi-sleep-personal" class="text-xs font-mono text-[#6E655F] tabular-nums">Tú: 5.5h</span>
+          </div>
+          <p id="top-kpi-sleep-note" class="text-xs text-[#6E655F] mt-2.5 truncate">Meta mínima recomendada: 6.0 h</p>
+        </button>
+
+        <!-- KPI 3: Riesgo de Micro-sueño -->
+        <button
+          type="button"
+          data-jump-tab="reactivacion"
+          class="warm-card rounded-2xl p-4 sm:p-5 text-left hover:border-[#C86D51]/60 transition-all duration-150 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold text-[#6E655F]">Riesgo de Micro-sueño</span>
+            <svg id="top-kpi-risk-icon" class="w-4 h-4 text-[#D99B26]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </div>
+          <div class="mt-2">
+            <span id="top-kpi-risk-label" class="text-xl sm:text-2xl font-bold text-[#2B2623]">Moderado</span>
+          </div>
+          <p id="top-kpi-risk-cta" class="text-xs font-medium text-[#A8543A] mt-2.5 flex items-center gap-1">
+            <span>Abrir pausa activa en aula</span>
+            <span aria-hidden="true">→</span>
+          </p>
+        </button>
+
+        <!-- KPI 4: Reportes del Día -->
+        <button
+          type="button"
+          data-jump-tab="comando"
+          class="warm-card rounded-2xl p-4 sm:p-5 text-left hover:border-[#C86D51]/60 transition-all duration-150 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold text-[#6E655F]">Reportes del Día</span>
+            <span id="top-kpi-live-badge" class="text-[11px] font-mono font-semibold text-[#4A7C59] tabular-nums">+0 en vivo</span>
+          </div>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span id="top-kpi-reports-val" class="font-mono text-3xl font-bold text-[#2B2623] tabular-nums">--</span>
+            <span id="top-kpi-red-share" class="text-xs font-mono text-[#B84A39] tabular-nums">--% crítico</span>
+          </div>
+          <p class="text-xs text-[#6E655F] mt-2.5 truncate">Ver analítica de comando →</p>
+        </button>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- MÓDULO 1: DIAGNÓSTICO RÁPIDO DE FATIGA (<30 SEGUNDOS)     -->
+      <!-- ========================================================= -->
+      <section id="panel-diagnostico" class="module-panel space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold text-[#A8543A] mb-1">Autoevaluación en aula · Menos de 30 segundos</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2B2623] tracking-tight text-balance">
+              Diagnóstico de Fatiga y Bienestar Operativo
+            </h1>
+          </div>
+          <button
+            type="button"
+            id="btn-reset-diag"
+            class="self-start sm:self-auto px-4 py-2 rounded-xl bg-[#FFFDF9] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-xs font-semibold text-[#2B2623] whitespace-nowrap shrink-0 transition-colors"
+          >
+            Restablecer valores
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Left Card: Agile Input Form -->
+          <div class="lg:col-span-7 warm-card rounded-3xl p-5 sm:p-7 space-y-6">
+            <!-- 1. Horas dormidas anoche -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-4">
+                <label for="input-sleep" class="text-sm font-bold text-[#2B2623]">
+                  1. Horas dormidas anoche
+                </label>
+                <span id="sleep-display" class="font-mono text-lg font-bold text-[#A8543A] bg-[#FDF2EE] px-3 py-1 rounded-xl tabular-nums">5.5 h</span>
+              </div>
+              <input
+                id="input-sleep"
+                type="range"
+                min="1"
+                max="9"
+                step="0.5"
+                value="5.5"
+                class="warm-slider"
+              />
+              <div class="flex justify-between text-[11px] font-mono text-[#6E655F] tabular-nums">
+                <span>1.0 h (Déficit severo)</span>
+                <span>6.0 h (Mínimo recomendado)</span>
+                <span>9.0 h (Óptimo)</span>
+              </div>
+            </div>
+
+            <div class="h-px bg-[#E8DFD1]"></div>
+
+            <!-- 2. Exigencia física acumulada del día -->
+            <div class="space-y-2.5">
+              <span class="block text-sm font-bold text-[#2B2623]">2. Exigencia física acumulada del día</span>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Exigencia física acumulada">
+                <button
+                  type="button"
+                  data-group="physical"
+                  data-value="low"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Baja / Guarnición</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Régimen administrativo</div>
+                </button>
+                <button
+                  type="button"
+                  data-group="physical"
+                  data-value="medium"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Media / Instrucción</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Orden cerrado y trote</div>
+                </button>
+                <button
+                  type="button"
+                  data-group="physical"
+                  data-value="extreme"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Extrema / Campaña</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Guardia nocturna o terreno</div>
+                </button>
+              </div>
+            </div>
+
+            <div class="h-px bg-[#E8DFD1]"></div>
+
+            <!-- 3. Consumo de cafeína/azúcar últimas 3h -->
+            <div class="space-y-2.5">
+              <span class="block text-sm font-bold text-[#2B2623]">3. Consumo de cafeína o azúcar en las últimas 3 h</span>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Consumo de cafeína o azúcar">
+                <button
+                  type="button"
+                  data-group="caffeine"
+                  data-value="none"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Ninguno</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Sin estimulantes recientes</div>
+                </button>
+                <button
+                  type="button"
+                  data-group="caffeine"
+                  data-value="pure"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Cafeína pura</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Café negro o mate amargo</div>
+                </button>
+                <button
+                  type="button"
+                  data-group="caffeine"
+                  data-value="sugar"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Azúcar / Energizante</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Alto riesgo de rebote</div>
+                </button>
+              </div>
+            </div>
+
+            <div class="h-px bg-[#E8DFD1]"></div>
+
+            <!-- 4. Estado sintomático actual en aula -->
+            <div class="space-y-2.5">
+              <span class="block text-sm font-bold text-[#2B2623]">4. Estado sintomático actual en aula</span>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Estado sintomático">
+                <button
+                  type="button"
+                  data-group="symptoms"
+                  data-value="alert"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Alerta</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Atención sostenida</div>
+                </button>
+                <button
+                  type="button"
+                  data-group="symptoms"
+                  data-value="heavy"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Párpados pesados</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Bostezos o fatiga visual</div>
+                </button>
+                <button
+                  type="button"
+                  data-group="symptoms"
+                  data-value="microsleep"
+                  class="diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px]"
+                >
+                  <div class="font-bold">Micro-sueños</div>
+                  <div class="text-[11px] opacity-80 mt-0.5">Cabeceos involuntarios</div>
+                </button>
+              </div>
+            </div>
+
+            <div class="h-px bg-[#E8DFD1]"></div>
+
+            <!-- 5. Selector de Compañía / Sección -->
+            <div class="space-y-2.5">
+              <span class="block text-sm font-bold text-[#2B2623]">5. Compañía / Sección orgánica</span>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" role="radiogroup" aria-label="Compañía o Sección">
+                <button type="button" data-group="company" data-value="1ra Cía" class="diag-option px-3 py-2.5 rounded-2xl border text-xs sm:text-sm font-bold text-center transition-all min-h-[44px]">
+                  1ra Cía
+                </button>
+                <button type="button" data-group="company" data-value="2da Cía" class="diag-option px-3 py-2.5 rounded-2xl border text-xs sm:text-sm font-bold text-center transition-all min-h-[44px]">
+                  2da Cía
+                </button>
+                <button type="button" data-group="company" data-value="3ra Cía" class="diag-option px-3 py-2.5 rounded-2xl border text-xs sm:text-sm font-bold text-center transition-all min-h-[44px]">
+                  3ra Cía
+                </button>
+                <button type="button" data-group="company" data-value="4ta Cía" class="diag-option px-3 py-2.5 rounded-2xl border text-xs sm:text-sm font-bold text-center transition-all min-h-[44px]">
+                  4ta Cía
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Separate Well-Spaced Gauge Card + Action Plan Card -->
+          <div class="lg:col-span-5 space-y-6">
+            <!-- Card A: Warm Visual Meter / Gauge -->
+            <div class="warm-card rounded-3xl p-5 sm:p-6 space-y-5">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <h2 class="text-base font-bold text-[#2B2623]">Medidor de Fatiga Aguda</h2>
+                  <p class="text-xs text-[#6E655F]">Cálculo ponderado en tiempo real</p>
+                </div>
+                <!-- Warm 3-lamp Semaphore -->
+                <div class="flex items-center gap-2 bg-[#FAF6F0] border border-[#E8DFD1] rounded-full px-3 py-1.5" aria-label="Semáforo de estado">
+                  <span id="lamp-green" class="w-3 h-3 rounded-full bg-[#E8DFD1] transition-all duration-200" title="Óptimo"></span>
+                  <span id="lamp-amber" class="w-3 h-3 rounded-full bg-[#E8DFD1] transition-all duration-200" title="Riesgo"></span>
+                  <span id="lamp-red" class="w-3 h-3 rounded-full bg-[#E8DFD1] transition-all duration-200" title="Crítico"></span>
+                </div>
+              </div>
+
+              <!-- Warm Semicircular SVG Gauge -->
+              <div class="flex flex-col items-center justify-center pt-1">
+                <div class="relative w-56 h-32 flex items-end justify-center">
+                  <svg viewBox="0 0 220 124" class="w-full h-full overflow-visible" aria-hidden="true">
+                    <!-- Background Arc -->
+                    <path
+                      d="M 22 108 A 88 88 0 0 1 198 108"
+                      fill="none"
+                      stroke="#F5EFE6"
+                      stroke-width="16"
+                      stroke-linecap="round"
+                    />
+                    <!-- Active Value Arc -->
+                    <path
+                      id="gauge-arc"
+                      d="M 22 108 A 88 88 0 0 1 198 108"
+                      fill="none"
+                      stroke="#D99B26"
+                      stroke-width="16"
+                      stroke-linecap="round"
+                      stroke-dasharray="276.46"
+                      stroke-dashoffset="276.46"
+                      style="transition: stroke-dashoffset 350ms cubic-bezier(0.16, 1, 0.3, 1), stroke 250ms ease;"
+                    />
+                  </svg>
+                  <div class="absolute bottom-1 text-center">
+                    <div class="flex items-baseline justify-center gap-1">
+                      <span id="fatigue-score" class="font-mono text-4xl font-extrabold text-[#2B2623] tabular-nums">0</span>
+                      <span class="font-mono text-xs font-semibold text-[#6E655F] tabular-nums">/ 100</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Linear Reference Bar -->
+              <div class="space-y-1.5">
+                <div class="relative h-2.5 w-full rounded-full bg-[#F5EFE6] overflow-hidden">
+                  <div id="fatigue-bar" class="h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+                  <div class="absolute top-0 bottom-0 left-[35%] w-0.5 bg-[#FFFDF9]"></div>
+                  <div class="absolute top-0 bottom-0 left-[65%] w-0.5 bg-[#FFFDF9]"></div>
+                </div>
+                <div class="flex justify-between text-[11px] font-mono text-[#6E655F] tabular-nums">
+                  <span>0 · Óptimo</span>
+                  <span>35 · Precaución</span>
+                  <span>65 · Crítico</span>
+                  <span>100</span>
+                </div>
+              </div>
+
+              <!-- Status Verdict Banner -->
+              <div id="verdict-banner" class="rounded-2xl border p-4 flex items-center gap-3 transition-colors duration-200">
+                <div id="verdict-icon" class="shrink-0"></div>
+                <div class="min-w-0">
+                  <div id="verdict-title" class="text-sm font-bold">Calculando...</div>
+                  <div id="verdict-subtitle" class="text-xs opacity-90 mt-0.5 leading-snug"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card B: Personalized Action Plan & Anonymous Report -->
+            <div class="warm-card rounded-3xl p-5 sm:p-6 space-y-5">
+              <div class="space-y-3">
+                <h2 class="text-base font-bold text-[#2B2623]">Plan de acción para las próximas 2 horas</h2>
+                <ul id="action-plan-list" class="space-y-2.5 text-xs sm:text-sm text-[#2B2623]"></ul>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  data-jump-tab="reactivacion"
+                  class="px-4 py-2.5 rounded-xl bg-[#C86D51] hover:bg-[#A8543A] text-white font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap text-center min-h-[44px]"
+                >
+                  Reactivación en Aula
+                </button>
+                <button
+                  type="button"
+                  data-jump-tab="descanso"
+                  class="px-4 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#2B2623] font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap text-center min-h-[44px]"
+                >
+                  Descanso y Rancho
+                </button>
+              </div>
+
+              <div class="h-px bg-[#E8DFD1]"></div>
+
+              <div class="space-y-2">
+                <button
+                  type="button"
+                  id="btn-send-report"
+                  class="w-full px-4 py-3 rounded-2xl bg-[#EEF5F0] hover:bg-[#dfece3] border border-[#4A7C59]/35 text-[#386145] font-bold text-sm transition-colors flex items-center justify-center gap-2 min-h-[46px]"
+                >
+                  <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 2L11 13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                  <span>+ Enviar reporte anónimo a Comando</span>
+                </button>
+                <p id="report-feedback" class="text-xs text-center text-[#6E655F] min-h-[18px]" aria-live="polite">
+                  Anónimo y confidencial. Actualiza las métricas del Panel Comando en tiempo real.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- MÓDULO 2: PROTOCOLOS DE REACTIVACIÓN EN AULA              -->
+      <!-- ========================================================= -->
+      <section id="panel-reactivacion" class="module-panel hidden space-y-6">
+        <div>
+          <p class="text-xs font-semibold text-[#A8543A] mb-1">Intervención discreta sin interrumpir la clase</p>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2B2623] tracking-tight text-balance">
+            Protocolos de Reactivación en Aula
+          </h1>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          <!-- Tarjeta 1: Respiración Táctica 4-2-2 -->
+          <article class="warm-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <h2 class="text-base font-bold text-[#2B2623]">Respiración Táctica 4-2-2</h2>
+                <span id="breath-cycle-counter" class="font-mono text-xs font-bold text-[#A8543A] bg-[#FDF2EE] px-2.5 py-1 rounded-full tabular-nums whitespace-nowrap">
+                  Ciclo 0 / 6
+                </span>
+              </div>
+              <p class="text-xs text-[#6E655F] leading-relaxed">
+                4s inhalar profundo, 2s retener, 2s exhalación rápida para activar el sistema nervioso simpático y despejar somnolencia.
+              </p>
+            </div>
+
+            <!-- Friendly Visual Stage -->
+            <div class="bg-[#FAF6F0] border border-[#E8DFD1] rounded-2xl p-5 flex flex-col items-center justify-center">
+              <div class="relative w-44 h-44 flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full border-2 border-dashed border-[#E8DFD1]"></div>
+                <div
+                  id="breath-orb"
+                  class="w-40 h-40 rounded-full bg-[#FDF2EE] border-[3px] border-[#C86D51] flex flex-col items-center justify-center text-center px-3 shadow-sm"
+                  style="transform: scale(0.58); transition-duration: 400ms;"
+                >
+                  <span id="breath-phase-label" class="text-sm font-bold text-[#2B2623]">Listo</span>
+                  <span id="breath-phase-timer" class="font-mono text-2xl font-extrabold text-[#A8543A] tabular-nums mt-0.5">4.0s</span>
+                </div>
+              </div>
+
+              <!-- Phase Rhythm Indicators -->
+              <div class="grid grid-cols-3 gap-1.5 w-full mt-4 text-center text-[11px] font-mono tabular-nums">
+                <div id="breath-pill-0" class="py-1 rounded-lg bg-[#FFFDF9] border border-[#E8DFD1] text-[#6E655F]">Inhalar 4s</div>
+                <div id="breath-pill-1" class="py-1 rounded-lg bg-[#FFFDF9] border border-[#E8DFD1] text-[#6E655F]">Retener 2s</div>
+                <div id="breath-pill-2" class="py-1 rounded-lg bg-[#FFFDF9] border border-[#E8DFD1] text-[#6E655F]">Exhalar 2s</div>
+              </div>
+
+              <p id="breath-instruction" class="text-xs text-[#6E655F] text-center mt-3 min-h-[32px]">
+                Presiona Iniciar para completar 6 ciclos de activación (48s total).
+              </p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                id="btn-breath-start"
+                class="px-3 py-2.5 rounded-xl bg-[#C86D51] hover:bg-[#A8543A] text-white font-semibold text-xs transition-colors min-h-[42px]"
+              >
+                Iniciar
+              </button>
+              <button
+                type="button"
+                id="btn-breath-pause"
+                class="px-3 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#2B2623] font-semibold text-xs transition-colors min-h-[42px]"
+              >
+                Pausar
+              </button>
+              <button
+                type="button"
+                id="btn-breath-reset"
+                class="px-3 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#6E655F] font-semibold text-xs transition-colors min-h-[42px]"
+              >
+                Reiniciar
+              </button>
+            </div>
+          </article>
+
+          <!-- Tarjeta 2: Activación Isométrica Discreta -->
+          <article class="warm-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <h2 class="text-base font-bold text-[#2B2623]">Activación Isométrica</h2>
+                <span id="iso-set-counter" class="font-mono text-xs font-bold text-[#4A7C59] bg-[#EEF5F0] px-2.5 py-1 rounded-full tabular-nums whitespace-nowrap">
+                  Serie 1 / 3
+                </span>
+              </div>
+              <p class="text-xs text-[#6E655F] leading-relaxed">
+                3 series discretas bajo el pupitre (15s contracción al 70% / 10s relajación) para impulsar el retorno venoso.
+              </p>
+
+              <div class="space-y-2" role="radiogroup" aria-label="Selector de ejercicio isométrico">
+                <button type="button" data-iso="calves" class="iso-select-btn w-full text-left px-3.5 py-2.5 rounded-2xl border text-xs font-semibold transition-all">
+                  1. Bombeo gemelar y glúteos
+                </button>
+                <button type="button" data-iso="plank" class="iso-select-btn w-full text-left px-3.5 py-2.5 rounded-2xl border text-xs font-semibold transition-all">
+                  2. Plancha abdominal en silla
+                </button>
+                <button type="button" data-iso="palms" class="iso-select-btn w-full text-left px-3.5 py-2.5 rounded-2xl border text-xs font-semibold transition-all">
+                  3. Presión cruzada palmas / muslos
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-[#FAF6F0] border border-[#E8DFD1] rounded-2xl p-4 space-y-3">
+              <p id="iso-desc" class="text-xs text-[#2B2623] leading-relaxed min-h-[48px]"></p>
+              <div class="flex items-baseline justify-between gap-2">
+                <span id="iso-phase-label" class="text-xs font-bold text-[#4A7C59]">Listo · Contracción 15s</span>
+                <span id="iso-timer" class="font-mono text-2xl font-extrabold text-[#2B2623] tabular-nums">00:15</span>
+              </div>
+              <div class="h-2.5 w-full rounded-full bg-[#E8DFD1]/70 overflow-hidden">
+                <div id="iso-progress" class="h-full rounded-full bg-[#4A7C59] transition-all duration-150" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                id="btn-iso-start"
+                class="px-3 py-2.5 rounded-xl bg-[#4A7C59] hover:bg-[#386145] text-white font-semibold text-xs transition-colors min-h-[42px]"
+              >
+                Iniciar
+              </button>
+              <button
+                type="button"
+                id="btn-iso-pause"
+                class="px-3 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#2B2623] font-semibold text-xs transition-colors min-h-[42px]"
+              >
+                Pausar
+              </button>
+              <button
+                type="button"
+                id="btn-iso-reset"
+                class="px-3 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#6E655F] font-semibold text-xs transition-colors min-h-[42px]"
+              >
+                Reiniciar
+              </button>
+            </div>
+          </article>
+
+          <!-- Tarjeta 3: Hidratación y Termorregulación -->
+          <article class="warm-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <h2 class="text-base font-bold text-[#2B2623]">Hidratación y Termorregulación</h2>
+                <span id="hydro-count" class="font-mono text-xs font-bold text-[#9A6B12] bg-[#FEF7E7] px-2.5 py-1 rounded-full tabular-nums whitespace-nowrap">
+                  0 / 3 pasos
+                </span>
+              </div>
+              <p class="text-xs text-[#6E655F] leading-relaxed">
+                Secuencia rápida de estímulo térmico y lumínico para cortar la transición hacia el cabeceo en clase.
+              </p>
+
+              <div class="space-y-2.5 pt-1">
+                <label class="flex items-start gap-3 p-3.5 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1] cursor-pointer hover:border-[#C86D51]/60 transition-colors">
+                  <input type="checkbox" class="hydro-check mt-0.5 w-4 h-4 accent-[#4A7C59] rounded cursor-pointer shrink-0" />
+                  <span class="text-xs text-[#6E655F] leading-snug">
+                    <strong class="block text-[#2B2623] font-bold mb-0.5">Agua fría a sorbos</strong>
+                    200 ml en sorbos cortos para estimular receptores térmicos orofaríngeos.
+                  </span>
+                </label>
+
+                <label class="flex items-start gap-3 p-3.5 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1] cursor-pointer hover:border-[#C86D51]/60 transition-colors">
+                  <input type="checkbox" class="hydro-check mt-0.5 w-4 h-4 accent-[#4A7C59] rounded cursor-pointer shrink-0" />
+                  <span class="text-xs text-[#6E655F] leading-snug">
+                    <strong class="block text-[#2B2623] font-bold mb-0.5">Enfriamiento de muñecas y nuca</strong>
+                    Aplicar agua fresca sobre arteria radial y base occipital.
+                  </span>
+                </label>
+
+                <label class="flex items-start gap-3 p-3.5 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1] cursor-pointer hover:border-[#C86D51]/60 transition-colors">
+                  <input type="checkbox" class="hydro-check mt-0.5 w-4 h-4 accent-[#4A7C59] rounded cursor-pointer shrink-0" />
+                  <span class="text-xs text-[#6E655F] leading-snug">
+                    <strong class="block text-[#2B2623] font-bold mb-0.5">Estímulo de luz diurna</strong>
+                    Fijar vista 15s hacia ventana o luz natural para inhibir melatonina residual.
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="bg-[#FAF6F0] border border-[#E8DFD1] rounded-2xl p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-[#2B2623]">Pausa activa (60s)</span>
+                <span id="hydro-timer" class="font-mono text-2xl font-extrabold text-[#2B2623] tabular-nums">01:00</span>
+              </div>
+              <div class="h-2.5 w-full rounded-full bg-[#E8DFD1]/70 overflow-hidden">
+                <div id="hydro-progress" class="h-full rounded-full bg-[#D99B26] transition-all duration-150" style="width: 100%;"></div>
+              </div>
+              <div class="grid grid-cols-3 gap-2 pt-1">
+                <button
+                  type="button"
+                  id="btn-hydro-start"
+                  class="px-3 py-2 rounded-xl bg-[#D99B26] hover:bg-[#be851b] text-[#2B2623] font-bold text-xs transition-colors min-h-[40px]"
+                >
+                  Iniciar
+                </button>
+                <button
+                  type="button"
+                  id="btn-hydro-pause"
+                  class="px-3 py-2 rounded-xl bg-[#FFFDF9] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#2B2623] font-semibold text-xs transition-colors min-h-[40px]"
+                >
+                  Pausar
+                </button>
+                <button
+                  type="button"
+                  id="btn-hydro-reset"
+                  class="px-3 py-2 rounded-xl bg-[#FFFDF9] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#6E655F] font-semibold text-xs transition-colors min-h-[40px]"
+                >
+                  Reiniciar
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- MÓDULO 3: GESTIÓN DEL DESCANSO Y RANCHO INTELIGENTE       -->
+      <!-- ========================================================= -->
+      <section id="panel-descanso" class="module-panel hidden space-y-6">
+        <div>
+          <p class="text-xs font-semibold text-[#A8543A] mb-1">Recuperación entre bloques y control glucémico</p>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2B2623] tracking-tight text-balance">
+            Gestión del Descanso y Rancho Inteligente
+          </h1>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Left: Power Nap 20:00 with Circular Warm Progress -->
+          <article id="powernap-card" class="lg:col-span-5 warm-card rounded-3xl p-5 sm:p-6 space-y-5 transition-all">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h2 class="text-lg font-bold text-[#2B2623]">Siesta Táctica (Power Nap)</h2>
+                <p class="text-xs text-[#6E655F] mt-1">
+                  20:00 min exactos para evitar la inercia del sueño profundo (etapa N3).
+                </p>
+              </div>
+              <span id="nap-stage-label" class="font-mono text-[11px] font-semibold px-3 py-1 rounded-full bg-[#FAF6F0] border border-[#E8DFD1] text-[#A8543A] whitespace-nowrap">
+                En espera
+              </span>
+            </div>
+
+            <!-- Friendly Circular Timer Stage -->
+            <div class="bg-[#FAF6F0] border border-[#E8DFD1] rounded-2xl p-5 flex flex-col items-center space-y-3">
+              <div class="relative w-48 h-48 flex items-center justify-center">
+                <svg viewBox="0 0 180 180" class="w-full h-full -rotate-90" aria-hidden="true">
+                  <circle cx="90" cy="90" r="78" fill="none" stroke="#E8DFD1" stroke-width="10" />
+                  <circle
+                    id="nap-ring"
+                    cx="90"
+                    cy="90"
+                    r="78"
+                    fill="none"
+                    stroke="#C86D51"
+                    stroke-width="10"
+                    stroke-linecap="round"
+                    stroke-dasharray="490.09"
+                    stroke-dashoffset="0"
+                    style="transition: stroke-dashoffset 350ms ease, stroke 250ms ease;"
+                  />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <div id="nap-timer-display" class="font-mono text-4xl sm:text-5xl font-extrabold text-[#2B2623] tabular-nums tracking-tight">
+                    20:00
+                  </div>
+                  <span class="text-[11px] font-medium text-[#6E655F] mt-1">Objetivo: N1 / N2</span>
+                </div>
+              </div>
+
+              <div class="w-full h-2 rounded-full bg-[#E8DFD1]/70 overflow-hidden">
+                <div id="nap-progress-bar" class="h-full rounded-full bg-[#C86D51] transition-all duration-200" style="width: 100%;"></div>
+              </div>
+              <p id="nap-status-text" class="text-xs text-[#6E655F] text-center">
+                Alarma sonora sintetizada localmente (Web Audio API) y alerta visual.
+              </p>
+            </div>
+
+            <!-- Active Alarm Banner -->
+            <div id="nap-alarm-banner" class="hidden rounded-2xl bg-[#FBEFEE] border border-[#B84A39] p-4 flex items-center justify-between gap-3">
+              <div class="text-xs sm:text-sm font-bold text-[#963829]">
+                Tiempo cumplido. Incorporarse de inmediato antes de entrar en sueño profundo.
+              </div>
+              <button
+                type="button"
+                id="btn-stop-alarm"
+                class="px-3.5 py-2 rounded-xl bg-[#B84A39] hover:bg-[#963829] text-white font-semibold text-xs whitespace-nowrap shrink-0"
+              >
+                Detener Alarma
+              </button>
+            </div>
+
+            <!-- Controls -->
+            <div class="grid grid-cols-3 gap-2.5">
+              <button
+                type="button"
+                id="btn-nap-start"
+                class="px-3 py-2.5 rounded-xl bg-[#C86D51] hover:bg-[#A8543A] text-white font-semibold text-xs sm:text-sm transition-colors min-h-[44px]"
+              >
+                Iniciar 20:00
+              </button>
+              <button
+                type="button"
+                id="btn-nap-pause"
+                class="px-3 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#2B2623] font-semibold text-xs sm:text-sm transition-colors min-h-[44px]"
+              >
+                Pausar
+              </button>
+              <button
+                type="button"
+                id="btn-nap-reset"
+                class="px-3 py-2.5 rounded-xl bg-[#FAF6F0] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-[#6E655F] font-semibold text-xs sm:text-sm transition-colors min-h-[44px]"
+              >
+                Reiniciar
+              </button>
+            </div>
+
+            <button
+              type="button"
+              id="btn-test-alarm"
+              class="w-full px-4 py-2.5 rounded-2xl bg-[#FEF7E7] hover:bg-[#fdeec8] border border-[#D99B26]/50 text-[#9A6B12] font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+            >
+              <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+              <span>Probar alarma (5s)</span>
+            </button>
+
+            <div class="h-px bg-[#E8DFD1]"></div>
+
+            <!-- Coffee Nap Protocol Toggle -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <span class="text-sm font-bold text-[#2B2623]">Protocolo "Coffee Nap"</span>
+                  <p class="text-xs text-[#6E655F]">Sinergia adenosina + cafeína a los 20 min</p>
+                </div>
+                <button
+                  type="button"
+                  id="btn-toggle-coffeenap"
+                  role="switch"
+                  aria-checked="false"
+                  class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border border-[#E8DFD1] bg-[#F5EFE6] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+                >
+                  <span id="coffeenap-knob" class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-[#FFFDF9] shadow-sm transition duration-200 translate-x-0"></span>
+                </button>
+              </div>
+              <div id="coffeenap-details" class="hidden rounded-2xl bg-[#FAF6F0] border border-[#C86D51]/35 p-4 text-xs text-[#2B2623] space-y-1.5 leading-relaxed">
+                <p class="font-bold text-[#A8543A]">Secuencia recomendada Coffee Nap:</p>
+                <p>1. Ingiere 1 taza de café negro sin azúcar justo antes de recostarte.</p>
+                <p>2. Inicia el temporizador de 20:00 min. El sueño ligero limpia la adenosina acumulada.</p>
+                <p>3. Al despertar con la alarma, la cafeína alcanza su pico en sangre y bloquea los receptores despejados sin inercia de sueño.</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Right: Smart Mess Hall Guide & Tray Simulator -->
+          <div class="lg:col-span-7 space-y-6">
+            <!-- Guía de Rancho Inteligente -->
+            <article class="warm-card rounded-3xl p-5 sm:p-6 space-y-5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h2 class="text-lg font-bold text-[#2B2623]">Guía de Rancho Inteligente</h2>
+                  <p class="text-xs text-[#6E655F] mt-0.5">Selección nutricional según tu siguiente bloque operativo</p>
+                </div>
+
+                <div class="inline-flex p-1 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1] self-start sm:self-auto">
+                  <button
+                    type="button"
+                    data-rancho-scene="preclase"
+                    class="rancho-scene-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all"
+                  >
+                    Pre-Clase Teórica
+                  </button>
+                  <button
+                    type="button"
+                    data-rancho-scene="postguardia"
+                    class="rancho-scene-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all"
+                  >
+                    Post-Guardia
+                  </button>
+                </div>
+              </div>
+
+              <p id="rancho-scene-summary" class="text-xs sm:text-sm text-[#6E655F] leading-relaxed"></p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="rounded-2xl bg-[#EEF5F0] border border-[#4A7C59]/25 p-4 space-y-2.5">
+                  <div class="flex items-center gap-2 text-sm font-bold text-[#386145]">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Elige esto</span>
+                  </div>
+                  <ul id="rancho-choose-list" class="space-y-2 text-xs text-[#2B2623]"></ul>
+                </div>
+
+                <div class="rounded-2xl bg-[#FBEFEE] border border-[#B84A39]/25 p-4 space-y-2.5">
+                  <div class="flex items-center gap-2 text-sm font-bold text-[#963829]">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                    <span>Evita esto</span>
+                  </div>
+                  <ul id="rancho-avoid-list" class="space-y-2 text-xs text-[#2B2623]"></ul>
+                </div>
+              </div>
+            </article>
+
+            <!-- Quick Tray Simulator -->
+            <article class="warm-card rounded-3xl p-5 sm:p-6 space-y-5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h2 class="text-base font-bold text-[#2B2623]">Simulador Rápido de Bandeja</h2>
+                  <p class="text-xs text-[#6E655F]">Selecciona los alimentos de tu bandeja para estimar el riesgo de bajón glucémico en aula.</p>
+                </div>
+                <button
+                  type="button"
+                  id="btn-clear-tray"
+                  class="self-start sm:self-auto px-3.5 py-1.5 rounded-xl bg-[#FAF6F0] hover:bg-[#F5EFE6] border border-[#E8DFD1] text-xs font-semibold text-[#2B2623] whitespace-nowrap"
+                >
+                  Limpiar bandeja
+                </button>
+              </div>
+
+              <div id="tray-items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
+
+              <div class="rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1] p-4 space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-xs font-bold text-[#2B2623]">Riesgo de bajón glucémico postprandial:</span>
+                  <div class="flex items-center gap-2">
+                    <span id="tray-risk-badge" class="text-xs font-bold px-3 py-0.5 rounded-full">Sin selección</span>
+                    <span id="tray-risk-pct" class="font-mono text-sm font-extrabold text-[#2B2623] tabular-nums">0%</span>
+                  </div>
+                </div>
+                <div class="h-3 w-full rounded-full bg-[#E8DFD1]/70 overflow-hidden">
+                  <div id="tray-risk-bar" class="h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+                <p id="tray-advice" class="text-xs text-[#6E655F] leading-relaxed">
+                  Marca al menos un alimento para estimar la curva glucémica esperada en las próximas 2 horas.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- MÓDULO 4: PANEL DE CONTROL PARA INSTRUCTORES / COMANDO    -->
+      <!-- ========================================================= -->
+      <section id="panel-comando" class="module-panel hidden space-y-6">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-semibold text-[#A8543A] mb-1">Monitoreo agregado y planificación académica</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2B2623] tracking-tight text-balance">
+              Panel de Control para Instructores y Comando
+            </h1>
+          </div>
+
+          <!-- Interactive Filters -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-1 p-1 rounded-2xl bg-[#FFFDF9] border border-[#E8DFD1] overflow-x-auto" role="group" aria-label="Filtro por compañía">
+              <button type="button" data-cmd-company="Todas" class="cmd-company-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all">Todas</button>
+              <button type="button" data-cmd-company="1ra Cía" class="cmd-company-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all">1ra Cía</button>
+              <button type="button" data-cmd-company="2da Cía" class="cmd-company-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all">2da Cía</button>
+              <button type="button" data-cmd-company="3ra Cía" class="cmd-company-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all">3ra Cía</button>
+              <button type="button" data-cmd-company="4ta Cía" class="cmd-company-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all">4ta Cía</button>
+            </div>
+
+            <div class="flex items-center gap-1 p-1 rounded-2xl bg-[#FFFDF9] border border-[#E8DFD1]" role="group" aria-label="Filtro por tipo de jornada">
+              <button type="button" data-cmd-shift="regular" class="cmd-shift-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all">Regular</button>
+              <button type="button" data-cmd-shift="postcampana" class="cmd-shift-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all">Post-Campaña</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Module 4 Summary Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="warm-card rounded-2xl p-4 sm:p-5 space-y-1">
+            <span class="text-xs font-semibold text-[#6E655F]">Promedio de sueño del batallón</span>
+            <div class="flex items-baseline gap-2">
+              <span id="kpi-avg-sleep" class="font-mono text-3xl font-extrabold text-[#2B2623] tabular-nums">--</span>
+              <span class="text-xs font-mono text-[#6E655F] tabular-nums">Meta ≥ 6.0 h</span>
+            </div>
+            <p id="kpi-avg-sleep-note" class="text-xs text-[#6E655F]"></p>
+          </div>
+
+          <div class="warm-card rounded-2xl p-4 sm:p-5 space-y-1">
+            <span class="text-xs font-semibold text-[#6E655F]">Cadetes en Alerta Roja</span>
+            <div class="flex items-baseline gap-2">
+              <span id="kpi-red-pct" class="font-mono text-3xl font-extrabold text-[#B84A39] tabular-nums">--</span>
+              <span class="text-xs font-mono text-[#6E655F] tabular-nums">Índice ≥ 65</span>
+            </div>
+            <p id="kpi-red-note" class="text-xs text-[#6E655F]"></p>
+          </div>
+
+          <div class="warm-card rounded-2xl p-4 sm:p-5 space-y-1">
+            <span class="text-xs font-semibold text-[#6E655F]">Franja horaria crítica</span>
+            <div class="flex items-baseline gap-2">
+              <span id="kpi-peak-slot" class="font-mono text-2xl sm:text-3xl font-extrabold text-[#9A6B12] tabular-nums">--:--</span>
+            </div>
+            <p id="kpi-peak-note" class="text-xs text-[#6E655F]"></p>
+          </div>
+
+          <div class="warm-card rounded-2xl p-4 sm:p-5 space-y-1">
+            <span class="text-xs font-semibold text-[#6E655F]">Total de reportes en vivo</span>
+            <div class="flex items-baseline gap-2">
+              <span id="kpi-total-reports" class="font-mono text-3xl font-extrabold text-[#4A7C59] tabular-nums">--</span>
+              <span id="kpi-live-added" class="text-xs font-mono font-semibold text-[#4A7C59] tabular-nums">+0 nuevos</span>
+            </div>
+            <p class="text-xs text-[#6E655F]">Evaluaciones anónimas recibidas</p>
+          </div>
+        </div>
+
+        <!-- 2 Native Interactive Warm SVG Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <article class="warm-card rounded-3xl p-5 sm:p-6 space-y-4 relative">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 class="text-base font-bold text-[#2B2623]">Horas de sueño promedio por Compañía</h2>
+                <p class="text-xs text-[#6E655F] mt-0.5">Umbral mínimo recomendado: 6.0 horas</p>
+              </div>
+              <span class="font-mono text-[11px] font-semibold text-[#9A6B12] bg-[#FEF7E7] px-2.5 py-1 rounded-full tabular-nums">Umbral: 6.0h</span>
+            </div>
+            <div id="chart-sleep-container" class="relative w-full h-[260px]"></div>
+          </article>
+
+          <article class="warm-card rounded-3xl p-5 sm:p-6 space-y-4 relative">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 class="text-base font-bold text-[#2B2623]">Incidencia de somnolencia en aula (07:00 – 21:00)</h2>
+                <p class="text-xs text-[#6E655F] mt-0.5">% de cadetes con signos de somnolencia por bloque horario</p>
+              </div>
+              <span class="font-mono text-[11px] font-semibold text-[#B84A39] bg-[#FBEFEE] px-2.5 py-1 rounded-full tabular-nums">Línea crítica: 50%</span>
+            </div>
+            <div id="chart-hourly-container" class="relative w-full h-[260px]"></div>
+          </article>
+        </div>
+
+        <!-- Dynamic Command Academic Recommendation + Live Feed -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <article class="lg:col-span-7 warm-card rounded-3xl p-5 sm:p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-[#FDF2EE] border border-[#E8DFD1] flex items-center justify-center text-[#C86D51]" aria-hidden="true">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+                </div>
+                <h2 class="text-base font-bold text-[#2B2623]">Recomendación Académica de Comando</h2>
+              </div>
+              <span id="cmd-rec-scope" class="font-mono text-xs font-semibold text-[#6E655F] tabular-nums"></span>
+            </div>
+            <div id="cmd-recommendation-body" class="space-y-3 text-xs sm:text-sm text-[#2B2623] leading-relaxed"></div>
+          </article>
+
+          <article class="lg:col-span-5 warm-card rounded-3xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-base font-bold text-[#2B2623]">Últimos reportes recibidos</h2>
+              <span class="text-xs font-mono text-[#6E655F]">Canal anónimo</span>
+            </div>
+            <div id="live-reports-table" class="divide-y divide-[#E8DFD1] text-xs"></div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        'use strict';
+
+        /* =========================================================
+           1. GLOBAL STATE & HEADER SYNC
+           ========================================================= */
+        const state = {
+          activeTab: 'diagnostico',
+          diag: {
+            sleep: 5.5,
+            physical: 'medium',
+            caffeine: 'none',
+            symptoms: 'heavy',
+            company: '1ra Cía',
+            score: 0,
+            status: 'amber',
+          },
+          cmd: {
+            company: 'Todas',
+            shift: 'regular',
+          },
+          ranchoScene: 'preclase',
+          traySelected: new Set(),
+          liveReports: [],
+        };
+
+        function updateClock() {
+          const now = new Date();
+          const hh = String(now.getHours()).padStart(2, '0');
+          const mm = String(now.getMinutes()).padStart(2, '0');
+          const ss = String(now.getSeconds()).padStart(2, '0');
+          const el = document.getElementById('military-clock');
+          if (el) el.textContent = `${hh}:${mm}:${ss}`;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        function switchTab(tabId) {
+          state.activeTab = tabId;
+          document.querySelectorAll('.module-panel').forEach((panel) => {
+            panel.classList.toggle('hidden', panel.id !== `panel-${tabId}`);
+          });
+          document.querySelectorAll('.nav-tab').forEach((btn) => {
+            const isActive = btn.dataset.tab === tabId;
+            if (isActive) {
+              btn.className =
+                'nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap shrink-0 transition-all duration-150 bg-[#C86D51] text-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]';
+            } else {
+              btn.className =
+                'nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 text-[#6E655F] hover:text-[#2B2623] hover:bg-[#FAF6F0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]';
+            }
+          });
+          if (tabId === 'comando') {
+            renderCommandDashboard();
+          }
+        }
+
+        document.querySelectorAll('.nav-tab').forEach((btn) => {
+          btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        document.querySelectorAll('[data-jump-tab]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            switchTab(btn.dataset.jumpTab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        });
+
+        // Header quick selectors synced with Diagnostic & Command
+        const headerCompanySel = document.getElementById('header-company-select');
+        const headerShiftSel = document.getElementById('header-shift-select');
+
+        headerCompanySel.addEventListener('change', (e) => {
+          state.diag.company = e.target.value;
+          state.cmd.company = e.target.value;
+          renderDiagnostics();
+          renderCommandDashboard();
+        });
+
+        headerShiftSel.addEventListener('change', (e) => {
+          state.cmd.shift = e.target.value;
+          renderCommandDashboard();
+        });
+
+        /* =========================================================
+           2. MÓDULO 1: MOTOR DE CÁLCULO Y MEDIDOR CÁLIDO
+           ========================================================= */
+        function calculateFatigueScore(d) {
+          let sleepPts = 0;
+          if (d.sleep <= 3) {
+            sleepPts = 42;
+          } else if (d.sleep <= 6) {
+            sleepPts = 42 - ((d.sleep - 3) / 3) * 22;
+          } else {
+            sleepPts = 20 - ((d.sleep - 6) / 3) * 18;
+          }
+
+          const physicalMap = { low: 4, medium: 11, extreme: 20 };
+          const physicalPts = physicalMap[d.physical] ?? 11;
+
+          const caffeineMap = { none: 6, pure: 2, sugar: 14 };
+          const caffeinePts = caffeineMap[d.caffeine] ?? 6;
+
+          const symptomsMap = { alert: 0, heavy: 14, microsleep: 24 };
+          const symptomsPts = symptomsMap[d.symptoms] ?? 0;
+
+          const total = Math.round(Math.min(100, Math.max(0, sleepPts + physicalPts + caffeinePts + symptomsPts)));
+          let status = 'green';
+          if (total >= 65) status = 'red';
+          else if (total >= 35) status = 'amber';
+
+          return { total, status };
+        }
+
+        function updateTopKpiCards(stats) {
+          const { score, status, sleep } = state.diag;
+          const fVal = document.getElementById('top-kpi-fatigue-val');
+          const fTag = document.getElementById('top-kpi-fatigue-tag');
+          const fBar = document.getElementById('top-kpi-fatigue-bar');
+          const rLabel = document.getElementById('top-kpi-risk-label');
+          const rIcon = document.getElementById('top-kpi-risk-icon');
+
+          fVal.textContent = score;
+          fBar.style.width = `${score}%`;
+
+          if (status === 'green') {
+            fTag.textContent = 'Óptimo';
+            fTag.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#EEF5F0] text-[#386145]';
+            fBar.style.backgroundColor = '#4A7C59';
+            rLabel.textContent = 'Bajo';
+            rLabel.className = 'text-xl sm:text-2xl font-extrabold text-[#4A7C59]';
+            rIcon.setAttribute('class', 'w-4 h-4 text-[#4A7C59]');
+          } else if (status === 'amber') {
+            fTag.textContent = 'Precaución';
+            fTag.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FEF7E7] text-[#9A6B12]';
+            fBar.style.backgroundColor = '#D99B26';
+            rLabel.textContent = 'Moderado';
+            rLabel.className = 'text-xl sm:text-2xl font-extrabold text-[#9A6B12]';
+            rIcon.setAttribute('class', 'w-4 h-4 text-[#D99B26]');
+          } else {
+            fTag.textContent = 'Crítico';
+            fTag.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FBEFEE] text-[#963829]';
+            fBar.style.backgroundColor = '#B84A39';
+            rLabel.textContent = 'Alto / Inminente';
+            rLabel.className = 'text-xl sm:text-2xl font-extrabold text-[#B84A39]';
+            rIcon.setAttribute('class', 'w-4 h-4 text-[#B84A39]');
+          }
+
+          document.getElementById('top-kpi-sleep-val').textContent = `${stats.globalAvgSleep} h`;
+          document.getElementById('top-kpi-sleep-personal').textContent = `Tú: ${sleep.toFixed(1)}h`;
+          document.getElementById('top-kpi-sleep-scope').textContent = state.cmd.company;
+          document.getElementById('top-kpi-reports-val').textContent = stats.totalRep;
+          document.getElementById('top-kpi-live-badge').textContent = `+${stats.totalLive} en vivo`;
+          document.getElementById('top-kpi-red-share').textContent = `${stats.globalRedPct}% crítico`;
+        }
+
+        function renderDiagnostics() {
+          const d = state.diag;
+
+          document.getElementById('sleep-display').textContent = `${d.sleep.toFixed(1)} h`;
+          document.getElementById('input-sleep').value = d.sleep;
+          headerCompanySel.value = d.company;
+
+          document.querySelectorAll('.diag-option').forEach((btn) => {
+            const group = btn.dataset.group;
+            const val = btn.dataset.value;
+            const selected = d[group] === val;
+            if (selected) {
+              btn.className =
+                'diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px] bg-[#FDF2EE] border-[#C86D51] text-[#2B2623] shadow-sm' +
+                (group === 'company' ? ' text-center font-bold' : '');
+            } else {
+              btn.className =
+                'diag-option text-left px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium transition-all min-h-[44px] bg-[#FAF6F0] border-[#E8DFD1] text-[#6E655F] hover:border-[#C86D51]/50 hover:text-[#2B2623]' +
+                (group === 'company' ? ' text-center font-bold' : '');
+            }
+          });
+
+          const { total, status } = calculateFatigueScore(d);
+          d.score = total;
+          d.status = status;
+
+          document.getElementById('fatigue-score').textContent = total;
+          const bar = document.getElementById('fatigue-bar');
+          bar.style.width = `${total}%`;
+
+          // Semicircular SVG Gauge arc length = Math.PI * 88 ≈ 276.46
+          const arcLen = 276.46;
+          const gaugeArc = document.getElementById('gauge-arc');
+          gaugeArc.setAttribute('stroke-dashoffset', (arcLen - (total / 100) * arcLen).toFixed(2));
+
+          // Semaphore lamps
+          const lampGreen = document.getElementById('lamp-green');
+          const lampAmber = document.getElementById('lamp-amber');
+          const lampRed = document.getElementById('lamp-red');
+          lampGreen.className = 'w-3 h-3 rounded-full transition-all duration-200 ' + (status === 'green' ? 'bg-[#4A7C59] ring-4 ring-[#4A7C59]/20' : 'bg-[#E8DFD1]');
+          lampAmber.className = 'w-3 h-3 rounded-full transition-all duration-200 ' + (status === 'amber' ? 'bg-[#D99B26] ring-4 ring-[#D99B26]/20' : 'bg-[#E8DFD1]');
+          lampRed.className = 'w-3 h-3 rounded-full transition-all duration-200 ' + (status === 'red' ? 'bg-[#B84A39] ring-4 ring-[#B84A39]/20' : 'bg-[#E8DFD1]');
+
+          const banner = document.getElementById('verdict-banner');
+          const vIcon = document.getElementById('verdict-icon');
+          const vTitle = document.getElementById('verdict-title');
+          const vSub = document.getElementById('verdict-subtitle');
+
+          if (status === 'green') {
+            bar.style.backgroundColor = '#4A7C59';
+            gaugeArc.setAttribute('stroke', '#4A7C59');
+            banner.className = 'rounded-2xl border p-4 flex items-center gap-3 bg-[#EEF5F0] border-[#4A7C59]/30 text-[#386145]';
+            vIcon.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+            vTitle.textContent = 'Verde Salvia · Estado Óptimo de Alerta';
+            vSub.textContent = 'Atención sostenida para clases teóricas sin riesgo inmediato.';
+          } else if (status === 'amber') {
+            bar.style.backgroundColor = '#D99B26';
+            gaugeArc.setAttribute('stroke', '#D99B26');
+            banner.className = 'rounded-2xl border p-4 flex items-center gap-3 bg-[#FEF7E7] border-[#D99B26]/40 text-[#9A6B12]';
+            vIcon.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+            vTitle.textContent = 'Ámbar · Riesgo Moderado de Micro-sueño';
+            vSub.textContent = 'Posible descenso de vigilia en los próximos 45 minutos.';
+          } else {
+            bar.style.backgroundColor = '#B84A39';
+            gaugeArc.setAttribute('stroke', '#B84A39');
+            banner.className = 'rounded-2xl border p-4 flex items-center gap-3 bg-[#FBEFEE] border-[#B84A39]/40 text-[#963829]';
+            vIcon.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+            vTitle.textContent = 'Coral Crítico · Fatiga Elevada';
+            vSub.textContent = 'Déficit severo o cabeceos activos. Aplica reactivación inmediata.';
+          }
+
+          const planItems = [];
+          if (status === 'red') {
+            planItems.push('Realiza ahora 6 ciclos de Respiración 4-2-2 y una serie isométrica discreta en aula.');
+            planItems.push('En el siguiente receso, programa una Siesta Táctica de 20:00 min (con Coffee Nap si aplica).');
+          } else if (status === 'amber') {
+            planItems.push('Toma agua fría a sorbos y ejecuta bombeo gemelar discreto cada 25 minutos.');
+            planItems.push('Mantén espalda despegada del respaldo y toma notas activas para sostener alerta.');
+          } else {
+            planItems.push('Mantén hidratación ligera cada 40 minutos durante el bloque teórico.');
+            planItems.push('Evita cargas de azúcares simples en el próximo rancho para conservar estabilidad.');
+          }
+
+          if (d.caffeine === 'sugar') {
+            planItems.push('Precaución por rebote glucémico: acompaña la siguiente hora con agua fresca y proteína magra.');
+          } else if (d.sleep < 6) {
+            planItems.push(`Déficit de sueño (${d.sleep.toFixed(1)}h): prioriza pausa de 20:00 min entre clases y descanso nocturno temprano.`);
+          } else {
+            planItems.push('Alterna 50 minutos de foco en clase con 1 minuto de luz natural al finalizar.');
+          }
+
+          const planListEl = document.getElementById('action-plan-list');
+          planListEl.innerHTML = planItems
+            .map(
+              (item, idx) =>
+                `<li class="flex items-start gap-3 p-3 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1]">
+                  <span class="font-mono text-xs font-bold text-[#A8543A] bg-[#FDF2EE] px-2 py-0.5 rounded-lg shrink-0">0${idx + 1}</span>
+                  <span class="leading-snug">${item}</span>
+                </li>`
+            )
+            .join('');
+
+          updateTopKpiCards(getAggregatedCommandStats());
+        }
+
+        document.getElementById('input-sleep').addEventListener('input', (e) => {
+          state.diag.sleep = parseFloat(e.target.value);
+          renderDiagnostics();
+        });
+
+        document.querySelectorAll('.diag-option').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const { group, value } = btn.dataset;
+            state.diag[group] = value;
+            renderDiagnostics();
+          });
+        });
+
+        document.getElementById('btn-reset-diag').addEventListener('click', () => {
+          state.diag = {
+            sleep: 5.5,
+            physical: 'medium',
+            caffeine: 'none',
+            symptoms: 'heavy',
+            company: state.diag.company || '1ra Cía',
+            score: 0,
+            status: 'amber',
+          };
+          renderDiagnostics();
+        });
+
+        document.getElementById('btn-send-report').addEventListener('click', () => {
+          renderDiagnostics();
+          const now = new Date();
+          const hh = String(now.getHours()).padStart(2, '0');
+          const mm = String(now.getMinutes()).padStart(2, '0');
+          const report = {
+            company: state.diag.company,
+            sleep: state.diag.sleep,
+            physical: state.diag.physical,
+            caffeine: state.diag.caffeine,
+            symptoms: state.diag.symptoms,
+            score: state.diag.score,
+            status: state.diag.status,
+            time: `${hh}:${mm}`,
+          };
+          state.liveReports.unshift(report);
+          const feedback = document.getElementById('report-feedback');
+          feedback.className = 'text-xs text-center text-[#386145] font-semibold min-h-[18px]';
+          feedback.textContent = `Reporte anónimo enviado (${report.company} · ${report.score}/100 a las ${report.time}). Total en sesión: ${state.liveReports.length}.`;
+
+          renderCommandDashboard();
+        });
+
+        /* =========================================================
+           3. MÓDULO 2: PROTOCOLOS DE REACTIVACIÓN EN AULA
+           ========================================================= */
+        const breathPhases = [
+          { name: 'Inhalar profundo', duration: 4.0, scale: 1.0, hint: 'Expande el abdomen por la nariz durante 4 segundos.', color: '#C86D51', bg: '#FDF2EE' },
+          { name: 'Retener aire', duration: 2.0, scale: 1.0, hint: 'Sostén el aire firme durante 2 segundos.', color: '#D99B26', bg: '#FEF7E7' },
+          { name: 'Exhalación rápida', duration: 2.0, scale: 0.58, hint: 'Suelta el aire con vigor por la boca para activar vigilia.', color: '#4A7C59', bg: '#EEF5F0' },
+        ];
+        const breathState = {
+          running: false,
+          cycle: 0,
+          phaseIdx: 0,
+          remaining: 4.0,
+          intervalId: null,
+          lastTick: 0,
+        };
+
+        function clearBreathInterval() {
+          if (breathState.intervalId !== null) {
+            clearInterval(breathState.intervalId);
+            breathState.intervalId = null;
+          }
+        }
+
+        function renderBreathUI() {
+          const orb = document.getElementById('breath-orb');
+          const label = document.getElementById('breath-phase-label');
+          const timer = document.getElementById('breath-phase-timer');
+          const counter = document.getElementById('breath-cycle-counter');
+          const instr = document.getElementById('breath-instruction');
+          const startBtn = document.getElementById('btn-breath-start');
+
+          [0, 1, 2].forEach((i) => {
+            const p = document.getElementById(`breath-pill-${i}`);
+            const isCurrent = breathState.cycle >= 1 && breathState.cycle <= 6 && breathState.phaseIdx === i;
+            p.className = isCurrent
+              ? 'py-1 rounded-lg bg-[#FDF2EE] border border-[#C86D51] text-[#A8543A] font-bold transition-colors'
+              : 'py-1 rounded-lg bg-[#FFFDF9] border border-[#E8DFD1] text-[#6E655F] transition-colors';
+          });
+
+          if (breathState.cycle === 0 && !breathState.running && breathState.phaseIdx === 0 && breathState.remaining === 4.0) {
+            counter.textContent = 'Ciclo 0 / 6';
+            label.textContent = 'Listo';
+            timer.textContent = '4.0s';
+            timer.style.color = '#A8543A';
+            orb.style.transform = 'scale(0.58)';
+            orb.style.transitionDuration = '350ms';
+            orb.style.borderColor = '#C86D51';
+            orb.style.backgroundColor = '#FDF2EE';
+            instr.textContent = 'Presiona Iniciar para completar 6 ciclos de activación (48s total).';
+            startBtn.textContent = 'Iniciar';
+            return;
+          }
+
+          if (breathState.cycle > 6) {
+            counter.textContent = 'Ciclo 6 / 6';
+            label.textContent = 'Completado';
+            timer.textContent = '0.0s';
+            timer.style.color = '#386145';
+            orb.style.transform = 'scale(0.75)';
+            orb.style.transitionDuration = '400ms';
+            orb.style.borderColor = '#4A7C59';
+            orb.style.backgroundColor = '#EEF5F0';
+            instr.textContent = 'Activación completada. Retoma postura erguida y continúa con la clase.';
+            startBtn.textContent = 'Iniciar';
+            return;
+          }
+
+          const phase = breathPhases[breathState.phaseIdx];
+          counter.textContent = `Ciclo ${breathState.cycle} / 6`;
+          label.textContent = phase.name;
+          timer.textContent = `${Math.max(0, breathState.remaining).toFixed(1)}s`;
+          timer.style.color = phase.color;
+          orb.style.borderColor = phase.color;
+          orb.style.backgroundColor = phase.bg;
+          orb.style.transitionDuration = phase.duration === 4.0 ? '3800ms' : phase.name.includes('Exhalación') ? '1800ms' : '300ms';
+          orb.style.transform = `scale(${phase.scale})`;
+          instr.textContent = phase.hint;
+          startBtn.textContent = breathState.running ? 'En curso' : 'Reanudar';
+        }
+
+        function startBreath() {
+          if (breathState.running) return;
+          clearBreathInterval();
+          if (breathState.cycle === 0 || breathState.cycle > 6) {
+            breathState.cycle = 1;
+            breathState.phaseIdx = 0;
+            breathState.remaining = breathPhases[0].duration;
+          }
+          breathState.running = true;
+          breathState.lastTick = Date.now();
+          renderBreathUI();
+
+          breathState.intervalId = setInterval(() => {
+            const now = Date.now();
+            const dt = (now - breathState.lastTick) / 1000;
+            breathState.lastTick = now;
+            breathState.remaining -= dt;
+
+            if (breathState.remaining <= 0) {
+              breathState.phaseIdx += 1;
+              if (breathState.phaseIdx >= breathPhases.length) {
+                breathState.phaseIdx = 0;
+                breathState.cycle += 1;
+                if (breathState.cycle > 6) {
+                  breathState.running = false;
+                  clearBreathInterval();
+                  renderBreathUI();
+                  return;
+                }
+              }
+              breathState.remaining = breathPhases[breathState.phaseIdx].duration;
+            }
+            renderBreathUI();
+          }, 100);
+        }
+
+        function pauseBreath() {
+          breathState.running = false;
+          clearBreathInterval();
+          renderBreathUI();
+        }
+
+        function resetBreath() {
+          breathState.running = false;
+          clearBreathInterval();
+          breathState.cycle = 0;
+          breathState.phaseIdx = 0;
+          breathState.remaining = 4.0;
+          renderBreathUI();
+        }
+
+        document.getElementById('btn-breath-start').addEventListener('click', startBreath);
+        document.getElementById('btn-breath-pause').addEventListener('click', pauseBreath);
+        document.getElementById('btn-breath-reset').addEventListener('click', resetBreath);
+
+        // --- Isometric Activation ---
+        const isoExercises = {
+          calves: 'Con los pies bajo el pupitre, despega ambos talones 2 cm y contrae gemelos y glúteos al 70% de fuerza de manera silenciosa.',
+          plank: 'Apoya la zona lumbar al respaldo, activa el abdomen hacia adentro y sostén tensión firme sin contener la respiración.',
+          palms: 'Presiona las palmas entre sí (o contra la cara interna de los muslos) generando tensión isométrica sostenida.',
+        };
+        const isoState = {
+          selected: 'calves',
+          running: false,
+          set: 1,
+          phase: 'work',
+          remaining: 15,
+          intervalId: null,
+        };
+
+        function clearIsoInterval() {
+          if (isoState.intervalId !== null) {
+            clearInterval(isoState.intervalId);
+            isoState.intervalId = null;
+          }
+        }
+
+        function renderIsoUI() {
+          document.querySelectorAll('.iso-select-btn').forEach((btn) => {
+            const active = btn.dataset.iso === isoState.selected;
+            btn.className = active
+              ? 'iso-select-btn w-full text-left px-3.5 py-2.5 rounded-2xl border text-xs font-bold transition-all bg-[#EEF5F0] border-[#4A7C59] text-[#386145]'
+              : 'iso-select-btn w-full text-left px-3.5 py-2.5 rounded-2xl border text-xs font-semibold transition-all bg-[#FAF6F0] border-[#E8DFD1] text-[#6E655F] hover:text-[#2B2623]';
+          });
+
+          document.getElementById('iso-desc').textContent = isoExercises[isoState.selected];
+          const setCounter = document.getElementById('iso-set-counter');
+          const phaseLabel = document.getElementById('iso-phase-label');
+          const timerEl = document.getElementById('iso-timer');
+          const progEl = document.getElementById('iso-progress');
+          const startBtn = document.getElementById('btn-iso-start');
+
+          if (isoState.phase === 'done') {
+            setCounter.textContent = 'Serie 3 / 3';
+            phaseLabel.textContent = 'Protocolo completado';
+            phaseLabel.className = 'text-xs font-bold text-[#4A7C59]';
+            timerEl.textContent = '00:00';
+            progEl.style.width = '100%';
+            progEl.style.backgroundColor = '#4A7C59';
+            startBtn.textContent = 'Iniciar';
+            return;
+          }
+
+          setCounter.textContent = `Serie ${isoState.set} / 3`;
+          const totalPhase = isoState.phase === 'work' ? 15 : 10;
+          const pct = Math.round(((totalPhase - isoState.remaining) / totalPhase) * 100);
+          progEl.style.width = `${pct}%`;
+
+          if (isoState.phase === 'work') {
+            phaseLabel.textContent = isoState.running ? 'Contracción al 70% (15s)' : 'Listo · Contracción 15s';
+            phaseLabel.className = 'text-xs font-bold text-[#4A7C59]';
+            progEl.style.backgroundColor = '#4A7C59';
+          } else {
+            phaseLabel.textContent = 'Relajación y respiración nasal (10s)';
+            phaseLabel.className = 'text-xs font-bold text-[#9A6B12]';
+            progEl.style.backgroundColor = '#D99B26';
+          }
+
+          timerEl.textContent = `00:${String(isoState.remaining).padStart(2, '0')}`;
+          startBtn.textContent = isoState.running ? 'En curso' : isoState.remaining < totalPhase || isoState.set > 1 || isoState.phase === 'rest' ? 'Reanudar' : 'Iniciar';
+        }
+
+        function startIso() {
+          if (isoState.running) return;
+          clearIsoInterval();
+          if (isoState.phase === 'done') {
+            isoState.set = 1;
+            isoState.phase = 'work';
+            isoState.remaining = 15;
+          }
+          isoState.running = true;
+          renderIsoUI();
+
+          isoState.intervalId = setInterval(() => {
+            isoState.remaining -= 1;
+            if (isoState.remaining <= 0) {
+              if (isoState.phase === 'work') {
+                isoState.phase = 'rest';
+                isoState.remaining = 10;
+              } else {
+                if (isoState.set >= 3) {
+                  isoState.phase = 'done';
+                  isoState.running = false;
+                  clearIsoInterval();
+                  renderIsoUI();
+                  return;
+                }
+                isoState.set += 1;
+                isoState.phase = 'work';
+                isoState.remaining = 15;
+              }
+            }
+            renderIsoUI();
+          }, 1000);
+        }
+
+        function pauseIso() {
+          isoState.running = false;
+          clearIsoInterval();
+          renderIsoUI();
+        }
+
+        function resetIso() {
+          isoState.running = false;
+          clearIsoInterval();
+          isoState.set = 1;
+          isoState.phase = 'work';
+          isoState.remaining = 15;
+          renderIsoUI();
+        }
+
+        document.querySelectorAll('.iso-select-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            isoState.selected = btn.dataset.iso;
+            resetIso();
+          });
+        });
+        document.getElementById('btn-iso-start').addEventListener('click', startIso);
+        document.getElementById('btn-iso-pause').addEventListener('click', pauseIso);
+        document.getElementById('btn-iso-reset').addEventListener('click', resetIso);
+
+        // --- Hydration & Thermoregulation ---
+        const hydroState = { running: false, remaining: 60, intervalId: null };
+
+        function clearHydroInterval() {
+          if (hydroState.intervalId !== null) {
+            clearInterval(hydroState.intervalId);
+            hydroState.intervalId = null;
+          }
+        }
+
+        function updateHydroChecklistCount() {
+          const checked = document.querySelectorAll('.hydro-check:checked').length;
+          document.getElementById('hydro-count').textContent = `${checked} / 3 pasos`;
+        }
+
+        document.querySelectorAll('.hydro-check').forEach((cb) => {
+          cb.addEventListener('change', updateHydroChecklistCount);
+        });
+
+        function renderHydroTimer() {
+          const timer = document.getElementById('hydro-timer');
+          const prog = document.getElementById('hydro-progress');
+          const startBtn = document.getElementById('btn-hydro-start');
+          const mins = String(Math.floor(hydroState.remaining / 60)).padStart(2, '0');
+          const secs = String(hydroState.remaining % 60).padStart(2, '0');
+          timer.textContent = `${mins}:${secs}`;
+          prog.style.width = `${Math.round((hydroState.remaining / 60) * 100)}%`;
+          startBtn.textContent = hydroState.running ? 'En curso' : hydroState.remaining < 60 && hydroState.remaining > 0 ? 'Reanudar' : 'Iniciar';
+        }
+
+        document.getElementById('btn-hydro-start').addEventListener('click', () => {
+          if (hydroState.running) return;
+          clearHydroInterval();
+          if (hydroState.remaining <= 0) hydroState.remaining = 60;
+          hydroState.running = true;
+          renderHydroTimer();
+          hydroState.intervalId = setInterval(() => {
+            hydroState.remaining -= 1;
+            if (hydroState.remaining <= 0) {
+              hydroState.remaining = 0;
+              hydroState.running = false;
+              clearHydroInterval();
+            }
+            renderHydroTimer();
+          }, 1000);
+        });
+
+        document.getElementById('btn-hydro-pause').addEventListener('click', () => {
+          hydroState.running = false;
+          clearHydroInterval();
+          renderHydroTimer();
+        });
+
+        document.getElementById('btn-hydro-reset').addEventListener('click', () => {
+          hydroState.running = false;
+          clearHydroInterval();
+          hydroState.remaining = 60;
+          renderHydroTimer();
+        });
+
+        /* =========================================================
+           4. MÓDULO 3: POWER NAP (20:00), WEB AUDIO Y RANCHO
+           ========================================================= */
+        const napState = {
+          running: false,
+          mode: 'nap',
+          remaining: 1200,
+          total: 1200,
+          intervalId: null,
+          alarmActive: false,
+          alarmIntervalId: null,
+          audioCtx: null,
+          coffeeNap: false,
+        };
+
+        function ensureAudioContext() {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return null;
+          if (!napState.audioCtx) {
+            napState.audioCtx = new AudioCtx();
+          }
+          if (napState.audioCtx.state === 'suspended') {
+            napState.audioCtx.resume();
+          }
+          return napState.audioCtx;
+        }
+
+        function playTacticalChime() {
+          const ctx = ensureAudioContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const notes = [
+            { freq: 587.33, start: 0.0, dur: 0.16 },
+            { freq: 880.0, start: 0.18, dur: 0.18 },
+            { freq: 1174.66, start: 0.38, dur: 0.28 },
+          ];
+          notes.forEach((n) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(n.freq, now + n.start);
+            gain.gain.setValueAtTime(0.0001, now + n.start);
+            gain.gain.exponentialRampToValueAtTime(0.24, now + n.start + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + n.start + n.dur);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + n.start);
+            osc.stop(now + n.start + n.dur + 0.02);
+          });
+        }
+
+        function clearNapInterval() {
+          if (napState.intervalId !== null) {
+            clearInterval(napState.intervalId);
+            napState.intervalId = null;
+          }
+        }
+
+        function stopNapAlarm() {
+          napState.alarmActive = false;
+          if (napState.alarmIntervalId !== null) {
+            clearInterval(napState.alarmIntervalId);
+            napState.alarmIntervalId = null;
+          }
+          document.getElementById('powernap-card').classList.remove('alarm-flashing');
+          document.getElementById('nap-alarm-banner').classList.add('hidden');
+          renderNapUI();
+        }
+
+        function triggerNapAlarm() {
+          stopNapAlarm();
+          napState.alarmActive = true;
+          document.getElementById('powernap-card').classList.add('alarm-flashing');
+          document.getElementById('nap-alarm-banner').classList.remove('hidden');
+          playTacticalChime();
+          let repeatCount = 0;
+          napState.alarmIntervalId = setInterval(() => {
+            repeatCount += 1;
+            if (!napState.alarmActive || repeatCount >= 12) {
+              if (repeatCount >= 12) stopNapAlarm();
+              return;
+            }
+            playTacticalChime();
+          }, 1500);
+          renderNapUI();
+        }
+
+        function renderNapUI() {
+          const display = document.getElementById('nap-timer-display');
+          const bar = document.getElementById('nap-progress-bar');
+          const ring = document.getElementById('nap-ring');
+          const stage = document.getElementById('nap-stage-label');
+          const statusTxt = document.getElementById('nap-status-text');
+          const startBtn = document.getElementById('btn-nap-start');
+
+          const mins = String(Math.floor(napState.remaining / 60)).padStart(2, '0');
+          const secs = String(napState.remaining % 60).padStart(2, '0');
+          display.textContent = `${mins}:${secs}`;
+
+          const ratio = Math.max(0, Math.min(1, napState.remaining / napState.total));
+          const pct = Math.round(ratio * 100);
+          bar.style.width = `${pct}%`;
+
+          const circ = 490.09;
+          ring.setAttribute('stroke-dashoffset', (circ * (1 - ratio)).toFixed(2));
+
+          if (napState.alarmActive) {
+            stage.textContent = 'Alarma activa';
+            stage.className = 'font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-[#FBEFEE] border border-[#B84A39] text-[#963829] whitespace-nowrap';
+            bar.style.backgroundColor = '#B84A39';
+            ring.setAttribute('stroke', '#B84A39');
+            statusTxt.textContent = 'Despertar inmediato para preservar agilidad cognitiva.';
+          } else if (napState.mode === 'test' && napState.running) {
+            stage.textContent = 'Prueba 5s';
+            stage.className = 'font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-[#FEF7E7] border border-[#D99B26] text-[#9A6B12] whitespace-nowrap';
+            bar.style.backgroundColor = '#D99B26';
+            ring.setAttribute('stroke', '#D99B26');
+            statusTxt.textContent = 'Verificando alarma sonora Web Audio API y alerta visual...';
+          } else if (napState.running) {
+            const elapsed = napState.total - napState.remaining;
+            stage.textContent = elapsed < 300 ? 'Latencia / N1' : 'Sueño ligero N2';
+            stage.className = 'font-mono text-[11px] font-bold px-3 py-1 rounded-full bg-[#EEF5F0] border border-[#4A7C59]/40 text-[#386145] whitespace-nowrap';
+            bar.style.backgroundColor = '#4A7C59';
+            ring.setAttribute('stroke', '#4A7C59');
+            statusTxt.textContent = 'Descanso en curso. La alarma sonará exactamente al llegar a 00:00.';
+          } else {
+            stage.textContent = napState.remaining < napState.total && napState.remaining > 0 ? 'Pausado' : 'En espera';
+            stage.className = 'font-mono text-[11px] font-semibold px-3 py-1 rounded-full bg-[#FAF6F0] border border-[#E8DFD1] text-[#A8543A] whitespace-nowrap';
+            bar.style.backgroundColor = '#C86D51';
+            ring.setAttribute('stroke', '#C86D51');
+            statusTxt.textContent = 'Alarma sonora sintetizada localmente (Web Audio API) y alerta visual.';
+          }
+
+          startBtn.textContent =
+            napState.running && napState.mode === 'nap'
+              ? 'En curso'
+              : napState.mode === 'nap' && napState.remaining < 1200 && napState.remaining > 0
+              ? 'Reanudar'
+              : 'Iniciar 20:00';
+        }
+
+        function startNapCountdown(mode) {
+          ensureAudioContext();
+          stopNapAlarm();
+          clearNapInterval();
+
+          if (mode === 'test') {
+            napState.mode = 'test';
+            napState.total = 5;
+            napState.remaining = 5;
+          } else if (napState.mode !== 'nap' || napState.remaining <= 0) {
+            napState.mode = 'nap';
+            napState.total = 1200;
+            napState.remaining = 1200;
+          }
+
+          napState.running = true;
+          renderNapUI();
+
+          napState.intervalId = setInterval(() => {
+            napState.remaining -= 1;
+            if (napState.remaining <= 0) {
+              napState.remaining = 0;
+              napState.running = false;
+              clearNapInterval();
+              triggerNapAlarm();
+              return;
+            }
+            renderNapUI();
+          }, 1000);
+        }
+
+        document.getElementById('btn-nap-start').addEventListener('click', () => {
+          if (napState.running && napState.mode === 'nap') return;
+          startNapCountdown('nap');
+        });
+        document.getElementById('btn-nap-pause').addEventListener('click', () => {
+          napState.running = false;
+          clearNapInterval();
+          renderNapUI();
+        });
+        document.getElementById('btn-nap-reset').addEventListener('click', () => {
+          napState.running = false;
+          clearNapInterval();
+          stopNapAlarm();
+          napState.mode = 'nap';
+          napState.total = 1200;
+          napState.remaining = 1200;
+          renderNapUI();
+        });
+        document.getElementById('btn-test-alarm').addEventListener('click', () => startNapCountdown('test'));
+        document.getElementById('btn-stop-alarm').addEventListener('click', stopNapAlarm);
+
+        // Coffee Nap Toggle
+        document.getElementById('btn-toggle-coffeenap').addEventListener('click', () => {
+          napState.coffeeNap = !napState.coffeeNap;
+          const btn = document.getElementById('btn-toggle-coffeenap');
+          const knob = document.getElementById('coffeenap-knob');
+          const details = document.getElementById('coffeenap-details');
+          btn.setAttribute('aria-checked', String(napState.coffeeNap));
+          if (napState.coffeeNap) {
+            btn.className = 'relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border border-[#C86D51] bg-[#C86D51] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]';
+            knob.className = 'pointer-events-none inline-block h-6 w-6 transform rounded-full bg-[#FFFDF9] shadow-sm transition duration-200 translate-x-5';
+            details.classList.remove('hidden');
+          } else {
+            btn.className = 'relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border border-[#E8DFD1] bg-[#F5EFE6] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]';
+            knob.className = 'pointer-events-none inline-block h-6 w-6 transform rounded-full bg-[#FFFDF9] shadow-sm transition duration-200 translate-x-0';
+            details.classList.add('hidden');
+          }
+        });
+
+        // Rancho Guide
+        const ranchoGuides = {
+          preclase: {
+            summary: 'Antes de clases teóricas (en especial tras el almuerzo), la prioridad es evitar picos de insulina y somnolencia postprandial.',
+            choose: [
+              'Proteína magra primero (pollo, pescado, huevo o carne sin grasa excesiva) para aportar tirosina.',
+              'Vegetales verdes y fibra (ensalada, palta) para moderar la absorción de glucosa.',
+              'Porción controlada de carbohidrato complejo (1/4 del plato).',
+              'Agua fresca o infusión sin azúcar; café negro solo si faltan >4 horas para dormir.',
+            ],
+            avoid: [
+              'Doble ración de arroz blanco, fideos o pan blanco (elevan la respuesta insulínica).',
+              'Gaseosas, jugos azucarados o postres dulces previos al bloque teórico.',
+              'Frituras pesadas y guisos grasos que enlentecen la digestión.',
+              'Bebidas energizantes con azúcar: causan caída brusca de atención en 45–60 min.',
+            ],
+          },
+          postguardia: {
+            summary: 'Al salir de guardia nocturna o campaña, el cuerpo requiere reposición hídrica y nutricional suave sin sobrecarga digestiva.',
+            choose: [
+              'Agua fresca con pizca de electrolitos o caldo ligero antes de alimentos sólidos.',
+              'Huevos, queso fresco o yogur natural con avena para estabilizar la glucemia.',
+              'Fruta entera de índice glucémico moderado (manzana, pera o cítricos).',
+              'Si vas a dormir pronto: cero cafeína; prioriza descanso inmediato.',
+            ],
+            avoid: [
+              'Bollería, pan dulce o mermeladas en ayunas tras guardia.',
+              'Exceso de café tras 10+ horas de vigilia si existe ventana para dormir.',
+              'Embutidos o comidas muy condimentadas que fragmentan el sueño reparador.',
+              'Saltarse la comida por completo: la hipoglucemia acentúa la fatiga cognitiva.',
+            ],
+          },
+        };
+
+        function renderRanchoGuide() {
+          document.querySelectorAll('.rancho-scene-btn').forEach((btn) => {
+            const active = btn.dataset.ranchoScene === state.ranchoScene;
+            btn.className = active
+              ? 'rancho-scene-btn px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-[#C86D51] text-white shadow-sm'
+              : 'rancho-scene-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all text-[#6E655F] hover:text-[#2B2623]';
+          });
+          const data = ranchoGuides[state.ranchoScene];
+          document.getElementById('rancho-scene-summary').textContent = data.summary;
+          document.getElementById('rancho-choose-list').innerHTML = data.choose
+            .map((item) => `<li class="flex items-start gap-2"><span class="text-[#4A7C59] font-bold mt-0.5">•</span><span>${item}</span></li>`)
+            .join('');
+          document.getElementById('rancho-avoid-list').innerHTML = data.avoid
+            .map((item) => `<li class="flex items-start gap-2"><span class="text-[#B84A39] font-bold mt-0.5">•</span><span>${item}</span></li>`)
+            .join('');
+        }
+
+        document.querySelectorAll('.rancho-scene-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.ranchoScene = btn.dataset.ranchoScene;
+            renderRanchoGuide();
+          });
+        });
+
+        // Quick Tray Simulator
+        const trayCatalog = [
+          { id: 'arroz', label: 'Arroz blanco / pasta doble', weight: 28, tag: '+Carga glucémica' },
+          { id: 'pan_dulce', label: 'Pan blanco / bollería / postre', weight: 26, tag: '+Pico insulínico' },
+          { id: 'jugo', label: 'Jugo azucarado / gaseosa', weight: 24, tag: '+Rebote rápido' },
+          { id: 'fritura', label: 'Fritura / guiso muy graso', weight: 18, tag: '+Digestión lenta' },
+          { id: 'proteina', label: 'Pechuga / carne magra / pescado', weight: -16, tag: 'Estabilizador' },
+          { id: 'huevo', label: 'Huevo / queso fresco', weight: -12, tag: 'Saciedad sostenida' },
+          { id: 'ensalada', label: 'Ensalada verde / palta', weight: -15, tag: 'Frena absorción' },
+          { id: 'integral', label: 'Avena / pan integral / legumbres', weight: 4, tag: 'Liberación lenta' },
+          { id: 'agua_cafe', label: 'Agua fría o café negro solo', weight: -8, tag: 'Hidratación limpia' },
+        ];
+
+        function renderTraySimulator() {
+          const grid = document.getElementById('tray-items-grid');
+          grid.innerHTML = trayCatalog
+            .map((item) => {
+              const checked = state.traySelected.has(item.id);
+              const isRisk = item.weight > 10;
+              return `
+                <label class="flex items-start gap-2.5 p-3 rounded-2xl border cursor-pointer transition-all ${
+                  checked ? 'bg-[#FDF2EE] border-[#C86D51]' : 'bg-[#FAF6F0] border-[#E8DFD1] hover:border-[#C86D51]/50'
+                }">
+                  <input type="checkbox" data-tray-id="${item.id}" ${checked ? 'checked' : ''} class="tray-checkbox mt-0.5 w-4 h-4 accent-[#C86D51] rounded cursor-pointer shrink-0" />
+                  <span class="min-w-0">
+                    <span class="block text-xs font-bold text-[#2B2623] leading-snug">${item.label}</span>
+                    <span class="block text-[11px] font-mono mt-0.5 ${isRisk ? 'text-[#9A6B12]' : 'text-[#386145]'}">${item.tag}</span>
+                  </span>
+                </label>
+              `;
+            })
+            .join('');
+
+          grid.querySelectorAll('.tray-checkbox').forEach((cb) => {
+            cb.addEventListener('change', (e) => {
+              const id = e.target.dataset.trayId;
+              if (e.target.checked) state.traySelected.add(id);
+              else state.traySelected.delete(id);
+              renderTraySimulator();
+            });
+          });
+
+          const badge = document.getElementById('tray-risk-badge');
+          const pctEl = document.getElementById('tray-risk-pct');
+          const bar = document.getElementById('tray-risk-bar');
+          const advice = document.getElementById('tray-advice');
+
+          if (state.traySelected.size === 0) {
+            badge.textContent = 'Sin selección';
+            badge.className = 'text-xs font-bold px-3 py-0.5 rounded-full bg-[#FFFDF9] text-[#6E655F] border border-[#E8DFD1]';
+            pctEl.textContent = '0%';
+            bar.style.width = '0%';
+            advice.textContent = 'Marca al menos un alimento para estimar la curva glucémica esperada en las próximas 2 horas.';
+            return;
+          }
+
+          let rawScore = 25;
+          state.traySelected.forEach((id) => {
+            const found = trayCatalog.find((x) => x.id === id);
+            if (found) rawScore += found.weight;
+          });
+          const riskPct = Math.max(5, Math.min(98, rawScore));
+          pctEl.textContent = `${riskPct}%`;
+          bar.style.width = `${riskPct}%`;
+
+          if (riskPct >= 65) {
+            badge.textContent = 'Riesgo Alto';
+            badge.className = 'text-xs font-bold px-3 py-0.5 rounded-full bg-[#FBEFEE] text-[#963829] border border-[#B84A39]/40';
+            bar.style.backgroundColor = '#B84A39';
+            advice.textContent = 'Alta probabilidad de bajón glucémico en 45–75 min. Reduce los carbohidratos simples, inicia con ensalada verde y evita bebidas azucaradas.';
+          } else if (riskPct >= 38) {
+            badge.textContent = 'Riesgo Moderado';
+            badge.className = 'text-xs font-bold px-3 py-0.5 rounded-full bg-[#FEF7E7] text-[#9A6B12] border border-[#D99B26]/40';
+            bar.style.backgroundColor = '#D99B26';
+            advice.textContent = 'Carga intermedia. Come primero la proteína y los vegetales antes de tocar los carbohidratos para amortiguar el pico de insulina.';
+          } else {
+            badge.textContent = 'Riesgo Bajo';
+            badge.className = 'text-xs font-bold px-3 py-0.5 rounded-full bg-[#EEF5F0] text-[#386145] border border-[#4A7C59]/40';
+            bar.style.backgroundColor = '#4A7C59';
+            advice.textContent = 'Bandeja balanceada para sostener vigilia en aula. Energía estable y mínima somnolencia postprandial.';
+          }
+        }
+
+        document.getElementById('btn-clear-tray').addEventListener('click', () => {
+          state.traySelected.clear();
+          renderTraySimulator();
+        });
+
+        /* =========================================================
+           5. MÓDULO 4: PANEL COMANDO (FILTROS, KPIS, GRÁFICOS SVG)
+           ========================================================= */
+        const baseBatallionData = {
+          regular: {
+            companies: {
+              '1ra Cía': { avgSleep: 6.1, redPct: 16, reports: 34 },
+              '2da Cía': { avgSleep: 5.7, redPct: 24, reports: 31 },
+              '3ra Cía': { avgSleep: 6.3, redPct: 12, reports: 29 },
+              '4ta Cía': { avgSleep: 5.4, redPct: 31, reports: 32 },
+            },
+            hourly: [
+              { slot: '07:00', pct: 26, factor: 'Inercia de despertar temprano' },
+              { slot: '09:00', pct: 18, factor: 'Pico matutino de alerta' },
+              { slot: '11:00', pct: 22, factor: 'Atención estable' },
+              { slot: '13:00', pct: 39, factor: 'Inicio ventana post-rancho' },
+              { slot: '14:30', pct: 58, factor: 'Valle circadiano + carga glucémica' },
+              { slot: '16:30', pct: 44, factor: 'Recuperación vespertina' },
+              { slot: '18:30', pct: 37, factor: 'Fatiga acumulada del día' },
+              { slot: '20:00', pct: 54, factor: 'Presión homeostática nocturna' },
+            ],
+          },
+          postcampana: {
+            companies: {
+              '1ra Cía': { avgSleep: 4.8, redPct: 48, reports: 38 },
+              '2da Cía': { avgSleep: 4.4, redPct: 57, reports: 36 },
+              '3ra Cía': { avgSleep: 5.1, redPct: 41, reports: 33 },
+              '4ta Cía': { avgSleep: 4.2, redPct: 64, reports: 37 },
+            },
+            hourly: [
+              { slot: '07:00', pct: 52, factor: 'Deuda aguda tras terreno/guardia' },
+              { slot: '09:00', pct: 38, factor: 'Repunte matutino' },
+              { slot: '11:00', pct: 43, factor: 'Déficit acumulativo de sueño' },
+              { slot: '13:00', pct: 61, factor: 'Rancho + agotamiento físico' },
+              { slot: '14:30', pct: 76, factor: 'Zona crítica de micro-sueños' },
+              { slot: '16:30', pct: 64, factor: 'Fatiga muscular y cognitiva' },
+              { slot: '18:30', pct: 59, factor: 'Baja reserva energética' },
+              { slot: '20:00', pct: 72, factor: 'Colapso atencional nocturno' },
+            ],
+          },
+        };
+
+        function getAggregatedCommandStats() {
+          const base = baseBatallionData[state.cmd.shift];
+          const companyKeys = ['1ra Cía', '2da Cía', '3ra Cía', '4ta Cía'];
+
+          const companiesComputed = {};
+          companyKeys.forEach((cKey) => {
+            const b = base.companies[cKey];
+            const matchingLive = state.liveReports.filter((r) => r.company === cKey);
+            const totalReports = b.reports + matchingLive.length;
+
+            const baseSleepSum = b.avgSleep * b.reports;
+            const liveSleepSum = matchingLive.reduce((acc, r) => acc + r.sleep, 0);
+            const avgSleep = Number(((baseSleepSum + liveSleepSum) / totalReports).toFixed(2));
+
+            const baseRedCount = Math.round((b.redPct / 100) * b.reports);
+            const liveRedCount = matchingLive.filter((r) => r.status === 'red').length;
+            const redPct = Math.round(((baseRedCount + liveRedCount) / totalReports) * 100);
+
+            companiesComputed[cKey] = { avgSleep, redPct, reports: totalReports, liveAdded: matchingLive.length };
+          });
+
+          const selectedScope = state.cmd.company === 'Todas' ? companyKeys : [state.cmd.company];
+
+          let totalRep = 0;
+          let weightedSleep = 0;
+          let weightedRed = 0;
+          let totalLive = 0;
+
+          selectedScope.forEach((k) => {
+            const c = companiesComputed[k];
+            totalRep += c.reports;
+            weightedSleep += c.avgSleep * c.reports;
+            weightedRed += c.redPct * c.reports;
+            totalLive += c.liveAdded;
+          });
+
+          const globalAvgSleep = (weightedSleep / totalRep).toFixed(1);
+          const globalRedPct = Math.round(weightedRed / totalRep);
+
+          const scopeSleepDelta = 5.8 - parseFloat(globalAvgSleep);
+          const hourlyAdjusted = base.hourly.map((pt, idx) => {
+            let offset = state.cmd.company === 'Todas' ? 0 : Math.round(scopeSleepDelta * 4.5);
+            const relevantLive = state.liveReports.filter(
+              (r) => state.cmd.company === 'Todas' || r.company === state.cmd.company
+            );
+            if (relevantLive.length > 0 && idx === 4) {
+              const liveRedRatio = relevantLive.filter((r) => r.status !== 'green').length / relevantLive.length;
+              offset += Math.round((liveRedRatio - 0.5) * 8);
+            }
+            const pct = Math.max(8, Math.min(95, pt.pct + offset));
+            return { ...pt, pct };
+          });
+
+          let peak = hourlyAdjusted[0];
+          hourlyAdjusted.forEach((h) => {
+            if (h.pct > peak.pct) peak = h;
+          });
+
+          return { companiesComputed, globalAvgSleep, globalRedPct, totalRep, totalLive, hourlyAdjusted, peak };
+        }
+
+        function createTooltipElement(container) {
+          let tip = container.querySelector('.chart-tooltip');
+          if (!tip) {
+            tip = document.createElement('div');
+            tip.className =
+              'chart-tooltip hidden pointer-events-none absolute z-20 px-3 py-2 rounded-xl bg-[#2B2623] text-xs text-[#FFFDF9] shadow-lg whitespace-nowrap';
+            container.appendChild(tip);
+          }
+          return tip;
+        }
+
+        function positionTooltip(container, tip, e) {
+          const rect = container.getBoundingClientRect();
+          const tipRect = tip.getBoundingClientRect();
+          let left = e.clientX - rect.left + 12;
+          let top = e.clientY - rect.top - tipRect.height - 10;
+          if (left + tipRect.width > rect.width) left = rect.width - tipRect.width - 8;
+          if (left < 4) left = 4;
+          if (top < 4) top = e.clientY - rect.top + 16;
+          tip.style.left = `${left}px`;
+          tip.style.top = `${top}px`;
+        }
+
+        function renderSleepChart(stats) {
+          const container = document.getElementById('chart-sleep-container');
+          const companyKeys = ['1ra Cía', '2da Cía', '3ra Cía', '4ta Cía'];
+          const width = 520;
+          const height = 240;
+          const pad = { top: 22, right: 20, bottom: 38, left: 40 };
+          const plotW = width - pad.left - pad.right;
+          const plotH = height - pad.top - pad.bottom;
+          const maxHours = 8.0;
+          const thresholdY = pad.top + plotH - (6.0 / maxHours) * plotH;
+
+          let gridSvg = '';
+          [0, 2, 4, 6, 8].forEach((tick) => {
+            const gy = pad.top + plotH - (tick / maxHours) * plotH;
+            gridSvg += `
+              <line x1="${pad.left}" y1="${gy}" x2="${width - pad.right}" y2="${gy}" stroke="#E8DFD1" stroke-width="1" />
+              <text x="${pad.left - 8}" y="${gy + 4}" text-anchor="end" fill="#6E655F" font-family="JetBrains Mono, monospace" font-size="10">${tick}h</text>
+            `;
+          });
+
+          let barsSvg = '';
+          const bandW = plotW / companyKeys.length;
+          const barW = Math.min(56, bandW * 0.52);
+
+          companyKeys.forEach((key, idx) => {
+            const data = stats.companiesComputed[key];
+            const val = Math.min(maxHours, data.avgSleep);
+            const barH = (val / maxHours) * plotH;
+            const x = pad.left + idx * bandW + (bandW - barW) / 2;
+            const y = pad.top + plotH - barH;
+            const isSelected = state.cmd.company === 'Todas' || state.cmd.company === key;
+            const fill = data.avgSleep >= 6.0 ? '#4A7C59' : data.avgSleep >= 5.2 ? '#D99B26' : '#B84A39';
+            const opacity = isSelected ? '0.92' : '0.32';
+
+            barsSvg += `
+              <g class="sleep-bar-group cursor-pointer" data-company="${key}" data-sleep="${data.avgSleep.toFixed(1)}" data-red="${data.redPct}" data-reports="${data.reports}">
+                <rect x="${x}" y="${pad.top}" width="${barW}" height="${plotH}" fill="transparent" />
+                <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="8" fill="${fill}" fill-opacity="${opacity}" />
+                <text x="${x + barW / 2}" y="${y - 6}" text-anchor="middle" fill="#2B2623" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700">${data.avgSleep.toFixed(1)}h</text>
+                <text x="${x + barW / 2}" y="${height - 12}" text-anchor="middle" fill="${isSelected ? '#2B2623' : '#9c928b'}" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="${isSelected ? '700' : '500'}">${key}</text>
+              </g>
+            `;
+          });
+
+          container.innerHTML = `
+            <svg viewBox="0 0 ${width} ${height}" class="w-full h-full overflow-visible" role="img" aria-label="Promedio de horas de sueño por compañía">
+              ${gridSvg}
+              ${barsSvg}
+              <line x1="${pad.left}" y1="${thresholdY}" x2="${width - pad.right}" y2="${thresholdY}" stroke="#D99B26" stroke-width="1.8" stroke-dasharray="5 4" />
+              <text x="${width - pad.right}" y="${thresholdY - 6}" text-anchor="end" fill="#9A6B12" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">Mínimo 6.0h</text>
+            </svg>
+          `;
+
+          const tip = createTooltipElement(container);
+          container.querySelectorAll('.sleep-bar-group').forEach((g) => {
+            g.addEventListener('mouseenter', (e) => {
+              const { company, sleep, red, reports } = g.dataset;
+              tip.innerHTML = `
+                <div class="font-bold">${company}</div>
+                <div class="font-mono text-[11px] text-[#F5EFE6] mt-0.5">Sueño prom: ${sleep} h</div>
+                <div class="font-mono text-[11px] text-[#fca5a5]">Alerta crítica: ${red}% · n=${reports}</div>
+              `;
+              tip.classList.remove('hidden');
+              positionTooltip(container, tip, e);
+            });
+            g.addEventListener('mousemove', (e) => positionTooltip(container, tip, e));
+            g.addEventListener('mouseleave', () => tip.classList.add('hidden'));
+          });
+        }
+
+        function renderHourlyChart(stats) {
+          const container = document.getElementById('chart-hourly-container');
+          const slots = stats.hourlyAdjusted;
+          const width = 520;
+          const height = 240;
+          const pad = { top: 22, right: 16, bottom: 38, left: 40 };
+          const plotW = width - pad.left - pad.right;
+          const plotH = height - pad.top - pad.bottom;
+          const critY = pad.top + plotH - (50 / 100) * plotH;
+
+          let gridSvg = '';
+          [0, 25, 50, 75, 100].forEach((tick) => {
+            const gy = pad.top + plotH - (tick / 100) * plotH;
+            gridSvg += `
+              <line x1="${pad.left}" y1="${gy}" x2="${width - pad.right}" y2="${gy}" stroke="#E8DFD1" stroke-width="1" />
+              <text x="${pad.left - 8}" y="${gy + 4}" text-anchor="end" fill="#6E655F" font-family="JetBrains Mono, monospace" font-size="10">${tick}%</text>
+            `;
+          });
+
+          const bandW = plotW / slots.length;
+          const barW = Math.min(34, bandW * 0.54);
+          let barsSvg = '';
+          const linePoints = [];
+
+          slots.forEach((s, idx) => {
+            const barH = (s.pct / 100) * plotH;
+            const cx = pad.left + idx * bandW + bandW / 2;
+            const x = cx - barW / 2;
+            const y = pad.top + plotH - barH;
+            linePoints.push(`${cx},${y}`);
+
+            const isCrit = s.pct >= 50;
+            const fill = isCrit ? '#B84A39' : s.pct >= 35 ? '#D99B26' : '#4A7C59';
+
+            barsSvg += `
+              <g class="hourly-bar-group cursor-pointer" data-slot="${s.slot}" data-pct="${s.pct}" data-factor="${s.factor}">
+                <rect x="${x - 4}" y="${pad.top}" width="${barW + 8}" height="${plotH}" fill="transparent" />
+                <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="6" fill="${fill}" fill-opacity="0.28" stroke="${fill}" stroke-width="1.2" />
+                <text x="${cx}" y="${height - 12}" text-anchor="middle" fill="#6E655F" font-family="JetBrains Mono, monospace" font-size="10">${s.slot}</text>
+              </g>
+            `;
+          });
+
+          const polyline = `<polyline points="${linePoints.join(' ')}" fill="none" stroke="#C86D51" stroke-width="2.5" stroke-linejoin="round" />`;
+          const dots = slots
+            .map((s, idx) => {
+              const cx = pad.left + idx * bandW + bandW / 2;
+              const cy = pad.top + plotH - (s.pct / 100) * plotH;
+              const dotColor = s.pct >= 50 ? '#B84A39' : '#C86D51';
+              return `<circle cx="${cx}" cy="${cy}" r="4" fill="${dotColor}" stroke="#FFFDF9" stroke-width="2" pointer-events="none" />`;
+            })
+            .join('');
+
+          container.innerHTML = `
+            <svg viewBox="0 0 ${width} ${height}" class="w-full h-full overflow-visible" role="img" aria-label="Incidencia de somnolencia en aula por bloque horario">
+              ${gridSvg}
+              ${barsSvg}
+              <line x1="${pad.left}" y1="${critY}" x2="${width - pad.right}" y2="${critY}" stroke="#B84A39" stroke-width="1.8" stroke-dasharray="5 4" />
+              <text x="${width - pad.right}" y="${critY - 6}" text-anchor="end" fill="#963829" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">Línea crítica 50%</text>
+              ${polyline}
+              ${dots}
+            </svg>
+          `;
+
+          const tip = createTooltipElement(container);
+          container.querySelectorAll('.hourly-bar-group').forEach((g) => {
+            g.addEventListener('mouseenter', (e) => {
+              const { slot, pct, factor } = g.dataset;
+              tip.innerHTML = `
+                <div class="font-mono font-bold">Bloque ${slot}</div>
+                <div class="font-mono text-[11px] ${Number(pct) >= 50 ? 'text-[#fca5a5]' : 'text-[#fde68a]'} mt-0.5">Somnolencia: ${pct}%</div>
+                <div class="text-[11px] text-[#E8DFD1] mt-0.5">${factor}</div>
+              `;
+              tip.classList.remove('hidden');
+              positionTooltip(container, tip, e);
+            });
+            g.addEventListener('mousemove', (e) => positionTooltip(container, tip, e));
+            g.addEventListener('mouseleave', () => tip.classList.add('hidden'));
+          });
+        }
+
+        function renderCommandDashboard() {
+          document.querySelectorAll('.cmd-company-btn').forEach((btn) => {
+            const active = btn.dataset.cmdCompany === state.cmd.company;
+            btn.className = active
+              ? 'cmd-company-btn px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-[#C86D51] text-white shadow-sm'
+              : 'cmd-company-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all text-[#6E655F] hover:text-[#2B2623]';
+          });
+          document.querySelectorAll('.cmd-shift-btn').forEach((btn) => {
+            const active = btn.dataset.cmdShift === state.cmd.shift;
+            btn.className = active
+              ? 'cmd-shift-btn px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-[#C86D51] text-white shadow-sm'
+              : 'cmd-shift-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all text-[#6E655F] hover:text-[#2B2623]';
+          });
+
+          headerShiftSel.value = state.cmd.shift;
+          if (state.cmd.company !== 'Todas') {
+            headerCompanySel.value = state.cmd.company;
+          }
+
+          const stats = getAggregatedCommandStats();
+          updateTopKpiCards(stats);
+
+          const sleepNum = parseFloat(stats.globalAvgSleep);
+          const kpiSleepEl = document.getElementById('kpi-avg-sleep');
+          kpiSleepEl.textContent = `${stats.globalAvgSleep} h`;
+          kpiSleepEl.className =
+            'font-mono text-3xl font-extrabold tabular-nums ' +
+            (sleepNum >= 6.0 ? 'text-[#4A7C59]' : sleepNum >= 5.2 ? 'text-[#9A6B12]' : 'text-[#B84A39]');
+          document.getElementById('kpi-avg-sleep-note').textContent =
+            sleepNum >= 6.0 ? 'Dentro del margen saludable' : `Déficit de ${(6.0 - sleepNum).toFixed(1)} h bajo el mínimo`;
+
+          document.getElementById('kpi-red-pct').textContent = `${stats.globalRedPct}%`;
+          document.getElementById('kpi-red-note').textContent =
+            stats.globalRedPct >= 40
+              ? 'Nivel crítico: reajustar carga académica'
+              : stats.globalRedPct >= 25
+              ? 'Atención: reforzar pausas activas'
+              : 'Incidencia contenida';
+
+          document.getElementById('kpi-peak-slot').textContent = stats.peak.slot;
+          document.getElementById('kpi-peak-note').textContent = `${stats.peak.pct}% somnolencia (${stats.peak.factor})`;
+
+          document.getElementById('kpi-total-reports').textContent = stats.totalRep;
+          document.getElementById('kpi-live-added').textContent = `+${stats.totalLive} en vivo`;
+
+          renderSleepChart(stats);
+          renderHourlyChart(stats);
+
+          const shiftLabel = state.cmd.shift === 'regular' ? 'Jornada Regular' : 'Jornada Post-Campaña';
+          document.getElementById('cmd-rec-scope').textContent = `${state.cmd.company} · ${shiftLabel}`;
+
+          const criticalSlots = stats.hourlyAdjusted.filter((h) => h.pct >= 50).map((h) => h.slot);
+          const safeSlots = stats.hourlyAdjusted.filter((h) => h.pct < 35).map((h) => h.slot);
+          const recBody = document.getElementById('cmd-recommendation-body');
+
+          const recLines = [];
+          if (state.cmd.shift === 'postcampana' || stats.globalRedPct >= 35) {
+            recLines.push(
+              `<div class="p-3.5 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1]"><strong class="text-[#2B2623]">Reubicación prioritaria:</strong> Mover asignaturas teóricas densas (Legislación Militar, Balística Analítica, Doctrina Táctica) fuera de las franjas críticas (${criticalSlots.join(', ') || stats.peak.slot}) hacia la ventana matutina (${safeSlots.length ? safeSlots.join(', ') : '09:00–11:00'}).</div>`
+            );
+            recLines.push(
+              `<div class="p-3.5 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1]"><strong class="text-[#2B2623]">Ventana de recuperación Post-Rancho:</strong> Habilitar 20 minutos de Siesta Táctica supervisada entre 13:45 y 14:15 para ${state.cmd.company === 'Todas' ? 'las compañías con promedio menor a 5.5 h' : state.cmd.company}.</div>`
+            );
+          } else {
+            recLines.push(
+              `<div class="p-3.5 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1]"><strong class="text-[#2B2623]">Optimización horaria:</strong> Concentrar materias de alta demanda analítica y evaluaciones en la franja 08:30–11:45 (${safeSlots.join(', ')}), donde la vigilancia del personal supera el 75%.</div>`
+            );
+            recLines.push(
+              `<div class="p-3.5 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1]"><strong class="text-[#2B2623]">Gestión del bloque ${stats.peak.slot} (${stats.peak.pct}%):</strong> Priorizar talleres prácticos, dinámicas grupales o resolución participativa en lugar de clases magistrales pasivas.</div>`
+            );
+          }
+          recLines.push(
+            `<div class="p-3.5 rounded-2xl bg-[#FAF6F0] border border-[#E8DFD1]"><strong class="text-[#2B2623]">Pausa activa en aula:</strong> Guiar 6 ciclos de Respiración 4-2-2 o activación isométrica (75s) a mitad de cada bloque de 90 minutos.</div>`
+          );
+          recBody.innerHTML = recLines.join('');
+
+          const feedEl = document.getElementById('live-reports-table');
+          const filteredLive = state.liveReports.filter(
+            (r) => state.cmd.company === 'Todas' || r.company === state.cmd.company
+          );
+
+          if (filteredLive.length === 0) {
+            feedEl.innerHTML = `
+              <div class="py-8 text-center space-y-3">
+                <p class="text-xs text-[#6E655F]">Aún no se han enviado reportes anónimos desde Diagnóstico en esta sesión${state.cmd.company !== 'Todas' ? ` para ${state.cmd.company}` : ''}.</p>
+                <button type="button" id="btn-empty-goto-m1" class="px-4 py-2 rounded-xl bg-[#FDF2EE] hover:bg-[#fae4dc] border border-[#C86D51]/30 text-xs font-bold text-[#A8543A]">
+                  Ir a Diagnóstico y enviar reporte
+                </button>
+              </div>
+            `;
+            const emptyBtn = document.getElementById('btn-empty-goto-m1');
+            if (emptyBtn) emptyBtn.addEventListener('click', () => switchTab('diagnostico'));
+          } else {
+            feedEl.innerHTML = filteredLive
+              .slice(0, 6)
+              .map((r) => {
+                const statusBadge =
+                  r.status === 'red'
+                    ? '<span class="text-[#963829] bg-[#FBEFEE] px-2 py-0.5 rounded-full font-bold">Crítico</span>'
+                    : r.status === 'amber'
+                    ? '<span class="text-[#9A6B12] bg-[#FEF7E7] px-2 py-0.5 rounded-full font-bold">Riesgo</span>'
+                    : '<span class="text-[#386145] bg-[#EEF5F0] px-2 py-0.5 rounded-full font-bold">Óptimo</span>';
+                return `
+                  <div class="py-3 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                      <span class="font-bold text-[#2B2623]">${r.company}</span>
+                      <span class="text-[#E8DFD1] mx-1.5">·</span>
+                      <span class="font-mono text-[#6E655F] tabular-nums">${r.sleep.toFixed(1)}h sueño</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 shrink-0 font-mono tabular-nums">
+                      ${statusBadge}
+                      <span class="font-bold text-[#2B2623]">${r.score}/100</span>
+                      <span class="text-[#6E655F]">${r.time}</span>
+                    </div>
+                  </div>
+                `;
+              })
+              .join('');
+          }
+        }
+
+        document.querySelectorAll('.cmd-company-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.cmd.company = btn.dataset.cmdCompany;
+            renderCommandDashboard();
+          });
+        });
+
+        document.querySelectorAll('.cmd-shift-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.cmd.shift = btn.dataset.cmdShift;
+            renderCommandDashboard();
+          });
+        });
+
+        /* =========================================================
+           6. INITIALIZATION
+           ========================================================= */
+        switchTab('diagnostico');
+        renderDiagnostics();
+        renderBreathUI();
+        renderIsoUI();
+        updateHydroChecklistCount();
+        renderHydroTimer();
+        renderNapUI();
+        renderRanchoGuide();
+        renderTraySimulator();
+        renderCommandDashboard();
+      })();
+    </script>
+  </body>
+</html>
