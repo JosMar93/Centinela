@@ -237,52 +237,41 @@
           </div>
         </div>
 
-        <!-- Clean Section Navigation -->
+        <!-- Clean Section Navigation with Step Numbers -->
         <nav class="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-[#E8DFD1]/80 py-2" aria-label="Navegación principal">
           <button
             type="button"
             data-tab="diagnostico"
-            class="nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+            class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
           >
-            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
+            <span class="nav-step-num w-5 h-5 rounded-full text-[11px] font-mono font-bold inline-flex items-center justify-center shrink-0">1</span>
             <span>Diagnóstico</span>
           </button>
 
           <button
             type="button"
             data-tab="reactivacion"
-            class="nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+            class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
           >
-            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-            </svg>
+            <span class="nav-step-num w-5 h-5 rounded-full text-[11px] font-mono font-bold inline-flex items-center justify-center shrink-0">2</span>
             <span>Reactivación en Aula</span>
           </button>
 
           <button
             type="button"
             data-tab="descanso"
-            class="nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+            class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
           >
-            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
+            <span class="nav-step-num w-5 h-5 rounded-full text-[11px] font-mono font-bold inline-flex items-center justify-center shrink-0">3</span>
             <span>Descanso y Rancho</span>
           </button>
 
           <button
             type="button"
             data-tab="comando"
-            class="nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
+            class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]"
           >
-            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="3" width="7" height="9" rx="1.5" />
-              <rect x="14" y="3" width="7" height="5" rx="1.5" />
-              <rect x="14" y="12" width="7" height="9" rx="1.5" />
-              <rect x="3" y="16" width="7" height="5" rx="1.5" />
-            </svg>
+            <span class="nav-step-num w-5 h-5 rounded-full text-[11px] font-mono font-bold inline-flex items-center justify-center shrink-0">4</span>
             <span>Panel Comando</span>
           </button>
         </nav>
@@ -291,6 +280,68 @@
 
     <!-- Main Dashboard Container -->
     <main class="flex-1 w-full max-w-[1320px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <!-- Interactive Cadet Wayfinding Strip (Where to Start) -->
+      <section aria-label="Ruta recomendada de uso" class="warm-card rounded-2xl p-3.5 sm:p-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-[#FDF2EE] border border-[#C86D51]/30 text-[11px] font-bold text-[#A8543A] whitespace-nowrap">
+              Empieza aquí
+            </span>
+            <span class="text-xs font-bold text-[#2B2623]">Ruta rápida del cadete:</span>
+          </div>
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 flex-1">
+            <button
+              type="button"
+              data-route-tab="diagnostico"
+              class="route-step-btn flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all"
+            >
+              <span class="route-badge w-6 h-6 rounded-full font-mono text-xs font-bold flex items-center justify-center shrink-0">1</span>
+              <span class="min-w-0">
+                <span class="block text-xs font-bold truncate">Evalúa tu fatiga</span>
+                <span class="block text-[10px] opacity-80 truncate">Inicio · &lt;30s</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              data-route-tab="reactivacion"
+              class="route-step-btn flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all"
+            >
+              <span class="route-badge w-6 h-6 rounded-full font-mono text-xs font-bold flex items-center justify-center shrink-0">2</span>
+              <span class="min-w-0">
+                <span class="block text-xs font-bold truncate">Actívate en aula</span>
+                <span class="block text-[10px] opacity-80 truncate">Si hay sueño</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              data-route-tab="descanso"
+              class="route-step-btn flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all"
+            >
+              <span class="route-badge w-6 h-6 rounded-full font-mono text-xs font-bold flex items-center justify-center shrink-0">3</span>
+              <span class="min-w-0">
+                <span class="block text-xs font-bold truncate">Descanso y rancho</span>
+                <span class="block text-[10px] opacity-80 truncate">Entre bloques</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              data-route-tab="comando"
+              class="route-step-btn flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all"
+            >
+              <span class="route-badge w-6 h-6 rounded-full font-mono text-xs font-bold flex items-center justify-center shrink-0">4</span>
+              <span class="min-w-0">
+                <span class="block text-xs font-bold truncate">Panel Comando</span>
+                <span class="block text-[10px] opacity-80 truncate">Reportes en vivo</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Top Interactive KPI Row (Real-Time) -->
       <section aria-label="Indicadores clave en tiempo real" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- KPI 1: Índice de Fatiga -->
@@ -375,9 +426,9 @@
       <section id="panel-diagnostico" class="module-panel space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <p class="text-xs font-semibold text-[#A8543A] mb-1">Autoevaluación en aula · Menos de 30 segundos</p>
+            <p class="text-xs font-bold text-[#A8543A] mb-1">Paso 1 de 4 · Empieza aquí (&lt; 30 segundos)</p>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2B2623] tracking-tight text-balance">
-              Diagnóstico de Fatiga y Bienestar Operativo
+              1. Diagnóstico de Fatiga y Bienestar Operativo
             </h1>
           </div>
           <button
@@ -392,6 +443,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <!-- Left Card: Agile Input Form -->
           <div class="lg:col-span-7 warm-card rounded-3xl p-5 sm:p-7 space-y-6">
+            <div class="flex items-center justify-between gap-2 pb-1 border-b border-[#E8DFD1]">
+              <h2 class="text-sm font-bold text-[#2B2623]">Paso 1A · Completa tus 5 datos en orden</h2>
+              <span class="text-[11px] font-semibold text-[#A8543A]">Inicio rápido</span>
+            </div>
             <!-- 1. Horas dormidas anoche -->
             <div class="space-y-3">
               <div class="flex items-center justify-between gap-4">
@@ -552,7 +607,7 @@
             <div class="warm-card rounded-3xl p-5 sm:p-6 space-y-5">
               <div class="flex items-center justify-between gap-3">
                 <div>
-                  <h2 class="text-base font-bold text-[#2B2623]">Medidor de Fatiga Aguda</h2>
+                  <h2 class="text-base font-bold text-[#2B2623]">Paso 1B · Medidor de Fatiga Aguda</h2>
                   <p class="text-xs text-[#6E655F]">Cálculo ponderado en tiempo real</p>
                 </div>
                 <!-- Warm 3-lamp Semaphore -->
@@ -625,7 +680,7 @@
             <!-- Card B: Personalized Action Plan & Anonymous Report -->
             <div class="warm-card rounded-3xl p-5 sm:p-6 space-y-5">
               <div class="space-y-3">
-                <h2 class="text-base font-bold text-[#2B2623]">Plan de acción para las próximas 2 horas</h2>
+                <h2 class="text-base font-bold text-[#2B2623]">Paso 1C · Qué hacer en las próximas 2 horas</h2>
                 <ul id="action-plan-list" class="space-y-2.5 text-xs sm:text-sm text-[#2B2623]"></ul>
               </div>
 
@@ -674,9 +729,9 @@
       <!-- ========================================================= -->
       <section id="panel-reactivacion" class="module-panel hidden space-y-6">
         <div>
-          <p class="text-xs font-semibold text-[#A8543A] mb-1">Intervención discreta sin interrumpir la clase</p>
+          <p class="text-xs font-bold text-[#A8543A] mb-1">Paso 2 de 4 · Si sientes sueño en clase, empieza por el protocolo 2.1</p>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2B2623] tracking-tight text-balance">
-            Protocolos de Reactivación en Aula
+            2. Protocolos de Reactivación en Aula
           </h1>
         </div>
 
@@ -685,7 +740,7 @@
           <article class="warm-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
             <div class="space-y-2">
               <div class="flex items-center justify-between gap-2">
-                <h2 class="text-base font-bold text-[#2B2623]">Respiración Táctica 4-2-2</h2>
+                <h2 class="text-base font-bold text-[#2B2623]">2.1 Respiración 4-2-2</h2>
                 <span id="breath-cycle-counter" class="font-mono text-xs font-bold text-[#A8543A] bg-[#FDF2EE] px-2.5 py-1 rounded-full tabular-nums whitespace-nowrap">
                   Ciclo 0 / 6
                 </span>
@@ -750,7 +805,7 @@
           <article class="warm-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
             <div class="space-y-3">
               <div class="flex items-center justify-between gap-2">
-                <h2 class="text-base font-bold text-[#2B2623]">Activación Isométrica</h2>
+                <h2 class="text-base font-bold text-[#2B2623]">2.2 Activación Isométrica</h2>
                 <span id="iso-set-counter" class="font-mono text-xs font-bold text-[#4A7C59] bg-[#EEF5F0] px-2.5 py-1 rounded-full tabular-nums whitespace-nowrap">
                   Serie 1 / 3
                 </span>
@@ -812,7 +867,7 @@
           <article class="warm-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
             <div class="space-y-3">
               <div class="flex items-center justify-between gap-2">
-                <h2 class="text-base font-bold text-[#2B2623]">Hidratación y Termorregulación</h2>
+                <h2 class="text-base font-bold text-[#2B2623]">2.3 Hidratación y Frío</h2>
                 <span id="hydro-count" class="font-mono text-xs font-bold text-[#9A6B12] bg-[#FEF7E7] px-2.5 py-1 rounded-full tabular-nums whitespace-nowrap">
                   0 / 3 pasos
                 </span>
@@ -889,9 +944,9 @@
       <!-- ========================================================= -->
       <section id="panel-descanso" class="module-panel hidden space-y-6">
         <div>
-          <p class="text-xs font-semibold text-[#A8543A] mb-1">Recuperación entre bloques y control glucémico</p>
+          <p class="text-xs font-bold text-[#A8543A] mb-1">Paso 3 de 4 · Recuperación entre bloques académicos o post-guardia</p>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2B2623] tracking-tight text-balance">
-            Gestión del Descanso y Rancho Inteligente
+            3. Gestión del Descanso y Rancho Inteligente
           </h1>
         </div>
 
@@ -900,7 +955,7 @@
           <article id="powernap-card" class="lg:col-span-5 warm-card rounded-3xl p-5 sm:p-6 space-y-5 transition-all">
             <div class="flex items-start justify-between gap-3">
               <div>
-                <h2 class="text-lg font-bold text-[#2B2623]">Siesta Táctica (Power Nap)</h2>
+                <h2 class="text-lg font-bold text-[#2B2623]">3.1 Siesta Táctica (Power Nap)</h2>
                 <p class="text-xs text-[#6E655F] mt-1">
                   20:00 min exactos para evitar la inercia del sueño profundo (etapa N3).
                 </p>
@@ -1031,7 +1086,7 @@
             <article class="warm-card rounded-3xl p-5 sm:p-6 space-y-5">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h2 class="text-lg font-bold text-[#2B2623]">Guía de Rancho Inteligente</h2>
+                  <h2 class="text-lg font-bold text-[#2B2623]">3.2 Guía de Rancho Inteligente</h2>
                   <p class="text-xs text-[#6E655F] mt-0.5">Selección nutricional según tu siguiente bloque operativo</p>
                 </div>
 
@@ -1083,7 +1138,7 @@
             <article class="warm-card rounded-3xl p-5 sm:p-6 space-y-5">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h2 class="text-base font-bold text-[#2B2623]">Simulador Rápido de Bandeja</h2>
+                  <h2 class="text-base font-bold text-[#2B2623]">3.3 Simulador Rápido de Bandeja</h2>
                   <p class="text-xs text-[#6E655F]">Selecciona los alimentos de tu bandeja para estimar el riesgo de bajón glucémico en aula.</p>
                 </div>
                 <button
@@ -1123,9 +1178,9 @@
       <section id="panel-comando" class="module-panel hidden space-y-6">
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
           <div>
-            <p class="text-xs font-semibold text-[#A8543A] mb-1">Monitoreo agregado y planificación académica</p>
+            <p class="text-xs font-bold text-[#A8543A] mb-1">Paso 4 de 4 · Monitoreo agregado para Instructores y Comando</p>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2B2623] tracking-tight text-balance">
-              Panel de Control para Instructores y Comando
+              4. Panel de Control para Instructores y Comando
             </h1>
           </div>
 
@@ -1285,12 +1340,36 @@
           });
           document.querySelectorAll('.nav-tab').forEach((btn) => {
             const isActive = btn.dataset.tab === tabId;
+            const numBadge = btn.querySelector('.nav-step-num');
             if (isActive) {
               btn.className =
-                'nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap shrink-0 transition-all duration-150 bg-[#C86D51] text-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]';
+                'nav-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap shrink-0 transition-all duration-150 bg-[#C86D51] text-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]';
+              if (numBadge) {
+                numBadge.className = 'nav-step-num w-5 h-5 rounded-full text-[11px] font-mono font-bold inline-flex items-center justify-center shrink-0 bg-white text-[#A8543A]';
+              }
             } else {
               btn.className =
-                'nav-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 text-[#6E655F] hover:text-[#2B2623] hover:bg-[#FAF6F0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]';
+                'nav-tab flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 text-[#6E655F] hover:text-[#2B2623] hover:bg-[#FAF6F0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C86D51]';
+              if (numBadge) {
+                numBadge.className = 'nav-step-num w-5 h-5 rounded-full text-[11px] font-mono font-bold inline-flex items-center justify-center shrink-0 bg-[#F5EFE6] text-[#2B2623] border border-[#E8DFD1]';
+              }
+            }
+          });
+          document.querySelectorAll('.route-step-btn').forEach((btn) => {
+            const isCurrent = btn.dataset.routeTab === tabId;
+            const badge = btn.querySelector('.route-badge');
+            if (isCurrent) {
+              btn.className =
+                'route-step-btn flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all bg-[#FDF2EE] border-[#C86D51] text-[#2B2623] shadow-sm';
+              if (badge) {
+                badge.className = 'route-badge w-6 h-6 rounded-full font-mono text-xs font-bold flex items-center justify-center shrink-0 bg-[#C86D51] text-white';
+              }
+            } else {
+              btn.className =
+                'route-step-btn flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all bg-[#FAF6F0] border-[#E8DFD1] text-[#6E655F] hover:border-[#C86D51]/50 hover:text-[#2B2623]';
+              if (badge) {
+                badge.className = 'route-badge w-6 h-6 rounded-full font-mono text-xs font-bold flex items-center justify-center shrink-0 bg-[#FFFDF9] border border-[#E8DFD1] text-[#2B2623]';
+              }
             }
           });
           if (tabId === 'comando') {
@@ -1300,6 +1379,10 @@
 
         document.querySelectorAll('.nav-tab').forEach((btn) => {
           btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        document.querySelectorAll('.route-step-btn').forEach((btn) => {
+          btn.addEventListener('click', () => switchTab(btn.dataset.routeTab));
         });
 
         document.querySelectorAll('[data-jump-tab]').forEach((btn) => {
